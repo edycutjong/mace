@@ -1,0 +1,45 @@
+# netlify.toml — mace / PointOfOrder
+#
+# Static site. There is no build step by design (see build/README.md
+# "Surfaces deliberately not used"): no bundler, no framework, no transpile.
+# The publish directory is the repository root, so every file a judge reads in
+# the repo is byte-identical to the file the browser executes.
+
+[build]
+  publish  = "."
+  command  = "echo 'no build step: mace is vanilla ES modules, zero runtime dependencies'"
+
+# WebMCP requires all three of these on every document response.
+# Source: the official Netlify WebMCP starter brief (Origin-Agent-Cluster: ?1
+# plus Permissions-Policy: tools=(self)) and the Chrome 149 origin trial
+# https://developer.chrome.com/origintrials/#/register_trial/4163014905550602241
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Origin-Agent-Cluster = "?1"
+    Permissions-Policy   = "tools=(self)"
+    # The origin-trial token is NOT a credential. It is an origin-bound public
+    # artifact, readable by anyone who loads the page, and it is committed on
+    # purpose so this deploy is reproducible from the repo alone.
+    # Value produced by the step in specs/production-plan.md §3.2 and pasted
+    # here the same hour the Netlify site name is claimed.
+    # Registered 2026-08-29 for https://pointoforder.netlify.app — decoded from
+    # the wire: feature "WebMCP", expiry 2026-11-17T00:00:00Z (56 days past the
+    # close of the Sep 4-21 judging window). See build/origin-trial.json.
+    Origin-Trial         = "Au5Mzo+rW6/1Nzha5ikPBg8vrwxF+sinJmpbzqOfYUyI7oWP2zE1UR//vNLb1K7utxQK5jkWHI0w6Mo+tYKjQwIAAABYeyJvcmlnaW4iOiJodHRwczovL3BvaW50b2ZvcmRlci5uZXRsaWZ5LmFwcDo0NDMiLCJmZWF0dXJlIjoiV2ViTUNQIiwiZXhwaXJ5IjoxNzk0ODczNjAwfQ=="
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy        = "no-referrer"
+
+[[headers]]
+  for = "/src/*"
+  [headers.values]
+    Content-Type = "text/javascript; charset=utf-8"
+
+# Three self-hosted woff2 files (specs/ui.md §3, complexity.md §7). Self-hosted
+# and not a CDN: a webfont fetched from a third origin is a third-party request
+# on a page whose whole claim is that it talks to nobody.
+[[headers]]
+  for = "/fonts/*"
+  [headers.values]
+    Content-Type  = "font/woff2"
+    Cache-Control = "public, max-age=31536000, immutable"

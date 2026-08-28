@@ -1,0 +1,23 @@
+{
+  "_comment": "Chrome origin-trial registration for this deploy. The token is NOT a credential: it is an origin-bound public artifact, readable by anyone who loads the page, and it is committed on purpose so this deploy is reproducible from the repo alone. Delivered two ways for redundancy - the Origin-Trial response header in netlify.toml, and a <meta http-equiv=\"origin-trial\"> in each HTML document.",
+  "feature": "WebMCP",
+  "origin": "https://pointoforder.netlify.app",
+  "trial_url": "https://developer.chrome.com/origintrials/#/register_trial/4163014905550602241",
+  "registered": "2026-08-29",
+  "match_subdomains": false,
+  "third_party": false,
+  "token": "Au5Mzo+rW6/1Nzha5ikPBg8vrwxF+sinJmpbzqOfYUyI7oWP2zE1UR//vNLb1K7utxQK5jkWHI0w6Mo+tYKjQwIAAABYeyJvcmlnaW4iOiJodHRwczovL3BvaW50b2ZvcmRlci5uZXRsaWZ5LmFwcDo0NDMiLCJmZWF0dXJlIjoiV2ViTUNQIiwiZXhwaXJ5IjoxNzk0ODczNjAwfQ==",
+  "decoded_from_wire": {
+    "origin": "https://pointoforder.netlify.app:443",
+    "feature": "WebMCP",
+    "expiry_unix": 1794873600,
+    "expiry_iso": "2026-11-17T00:00:00Z"
+  },
+  "trial_availability": "Chrome 149 to 156; ends with the rollout of the next Chrome release, no later than 2026-11-17",
+  "judging_window": "2026-09-04 to 2026-09-21",
+  "margin_days_past_judging_close": 56,
+  "verified": [
+    { "date": "2026-08-29", "by": "base64 decode of the token payload", "result": "origin, feature and expiry all match; 56 days of margin" }
+  ],
+  "reverify_due": "2026-09-03 (D8, before the human submit gate)"
+}
