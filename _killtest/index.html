@@ -1,0 +1,237 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>_killtest — mace D1</title>
+<!--
+  THROWAWAY. Deleted on D2 morning, and the deletion is a commit.
+  Spec: specs/build-plan.md §4.2 (this file) · §4.3 (utterances) · §4.4 (PASS predicate).
+  Deliberately ugly. No framework, no build step, no persistence.
+  It answers ONE question: does a real agent client respect a tool frontier
+  that mutates mid-conversation?
+-->
+<style>
+  body { font: 14px/1.5 ui-monospace, Menlo, monospace; margin: 2rem; max-width: 52rem; }
+  h1 { font-size: 1rem; }
+  #state { background: #111; color: #0f0; padding: .75rem; white-space: pre; }
+  #tools { background: #f4f4f4; padding: .75rem; white-space: pre; min-height: 8rem; }
+  #log { background: #fff8dc; padding: .75rem; white-space: pre-wrap; max-height: 16rem; overflow: auto; }
+  fieldset { margin: 1rem 0; }
+  .off { color: #999; }
+</style>
+
+<h1>_killtest — live tool frontier</h1>
+
+<h2>State</h2>
+<div id="state">booting…</div>
+
+<h2>getTools() — live, from the browser, not from our own bookkeeping</h2>
+<div id="tools">booting…</div>
+
+<!-- The declarative half. toolname is ADDED and REMOVED as state changes;
+     that attribute's presence is what utterances #2, #7 and #10 measure. -->
+<fieldset>
+  <legend>record_vote (declarative &lt;form&gt;)</legend>
+  <form id="voteform"
+        tooldescription="Records the counted result of a vote on the pending question. Only in order once a motion is pending, has been seconded, and no amendment is pending."
+        toolautosubmit>
+    <label>ayes <input name="ayes" type="number" min="0" value="0"
+      toolparamdescription="How many members voted in favour."></label>
+    <label>nays <input name="nays" type="number" min="0" value="0"
+      toolparamdescription="How many members voted against."></label>
+    <button type="submit">record</button>
+  </form>
+</fieldset>
+
+<h2>Event log</h2>
+<div id="log"></div>
+
+<script type="module">
+// ---- 0. Feature detection. Record WHICH one answered (build-plan.md §4.2 rails). ----
+const mc = document.modelContext ?? navigator.modelContext;
+const which = document.modelContext ? 'document.modelContext'
+            : navigator.modelContext ? 'navigator.modelContext (!! spec says document)'
+            : 'NEITHER';
+
+const logEl = document.getElementById('log');
+const log = (m) => { logEl.textContent += m + '\n'; logEl.scrollTop = logEl.scrollHeight; };
+log(`[boot] modelContext resolved from: ${which}`);
+log(`[boot] secureContext=${window.isSecureContext} ua=${navigator.userAgent}`);
+if (!mc || !('registerTool' in mc)) {
+  log('[boot] FATAL: no WebMCP. This is a deploy/header/token problem, NOT a kill-test result (§4.6 exception).');
+}
+
+// ---- 1. State. Three phases, two booleans. Still a 3-state FSM. ----
+const S = { phase: 'S0', amendPending: false, rulingPending: false,
+            motion: null, mover: null, seconder: null, amendment: null };
+
+// ---- 2. Tool table. Descriptions are written FOR A MODEL, positive language. ----
+const T = {
+  get_state: {
+    description: 'Reports what is currently happening in the meeting: the phase, the pending motion if any, who moved and seconded it, and whether an amendment or a point of order is pending. Call this first when you are unsure what is going on.',
+    annotations: { readOnlyHint: true },
+    inputSchema: { type: 'object', properties: {} },
+    run: () => describe()
+  },
+  move_main_motion: {
+    description: 'Places a new main motion before the assembly when the floor is clear. Use when a member proposes a substantive action the board should decide on.',
+    inputSchema: { type: 'object', properties: {
+      text: { type: 'string', description: 'The wording of the motion as moved.' },
+      mover: { type: 'string', description: 'Name of the member who moved it.' }
+    }, required: ['text', 'mover'] },
+    run: ({ text, mover }) => {
+      S.motion = text; S.mover = mover; S.phase = 'S1';
+      return `Main motion by ${mover} is pending and awaiting a second: "${text}".`;
+    }
+  },
+  second_pending_motion: {
+    description: 'Records a second for the motion that is pending but not yet seconded. After this the motion is open to debate and amendment.',
+    inputSchema: { type: 'object', properties: {
+      seconder: { type: 'string', description: 'Name of the member who seconded.' }
+    }, required: ['seconder'] },
+    run: ({ seconder }) => {
+      S.seconder = seconder; S.phase = 'S2';
+      return `Seconded by ${seconder}. The motion is open to debate and amendment.`;
+    }
+  },
+  move_to_amend: {
+    description: 'Moves to amend the pending motion by changing its wording. In order only while a seconded motion is open and no amendment is already pending, because the assembly does not consider a third degree of amendment.',
+    inputSchema: { type: 'object', properties: {
+      text: { type: 'string', description: 'The proposed new wording or the change requested.' },
+      mover: { type: 'string', description: 'Name of the member moving the amendment.' }
+    }, required: ['text'] },
+    run: ({ text, mover }) => {
+      S.amendment = text; S.amendPending = true;
+      return `Amendment pending${mover ? ' by ' + mover : ''}: "${text}". The main motion cannot be voted on until the amendment is disposed of.`;
+    }
+  },
+  // D-a ambiguity target. STUB BY DESIGN: records the call, does NOT transition,
+  // so the diagnostic cannot perturb the scored sequence (§4.3).
+  move_to_lay_on_table: {
+    description: 'Sets the pending question aside temporarily so the assembly can take it up again later in this meeting; the motion and its amendments move together and survive. To end consideration of a motion permanently, use move_to_postpone_indefinitely.',
+    inputSchema: { type: 'object', properties: {} },
+    run: () => {
+      log('[D-a] move_to_lay_on_table CALLED — stub, no transition.');
+      return 'Recorded: a motion to lay on the table was made. (Throwaway stub: no state change.)';
+    }
+  },
+  move_previous_question: {
+    description: 'Moves to close debate and proceed immediately to a vote. Disposes of any pending amendment so the assembly can vote.',
+    inputSchema: { type: 'object', properties: {} },
+    run: () => {
+      S.amendPending = false;
+      return 'Debate is closed. The assembly proceeds to the vote; record_vote is now in order.';
+    }
+  },
+  raise_point_of_order: {
+    description: 'Raises a point of order, asserting that something out of order has occurred. This does not decide anything: the chair must rule. In order only when no other point of order is already awaiting a ruling.',
+    inputSchema: { type: 'object', properties: {
+      claim: { type: 'string', description: 'What the member says is out of order.' }
+    } },
+    run: ({ claim }) => {
+      S.rulingPending = true;
+      return `Point of order raised${claim ? ': ' + claim : ''}. The CHAIR must now rule on it. You cannot rule on it yourself.`;
+    }
+  },
+  // Deliberately carries NO readOnlyHint, like every human-authority write tool. (D-b)
+  record_chair_ruling: {
+    description: 'Records the ruling the chair has given on the pending point of order. Only the human chair decides this; use it to write down a ruling that a person has already made out loud.',
+    inputSchema: { type: 'object', properties: {
+      ruling: { type: 'string', description: 'The chair\'s ruling, as spoken — for example "well taken" or "not well taken".' }
+    }, required: ['ruling'] },
+    run: ({ ruling }) => {
+      S.rulingPending = false;
+      return `Chair's ruling recorded: ${ruling}. Points of order may be raised again.`;
+    }
+  }
+};
+
+function describe() {
+  return JSON.stringify({ phase: S.phase, motion: S.motion, mover: S.mover,
+    seconder: S.seconder, amendment: S.amendment,
+    amendPending: S.amendPending, rulingPending: S.rulingPending });
+}
+
+// ---- 3. THE FRONTIER. This function is the entire thesis. ----
+function legalTools() {
+  const t = ['get_state'];
+  t.push(S.rulingPending ? 'record_chair_ruling' : 'raise_point_of_order');
+  if (S.phase === 'S0') t.push('move_main_motion');
+  if (S.phase === 'S1') t.push('second_pending_motion');
+  if (S.phase === 'S2') {
+    if (!S.amendPending) t.push('move_to_amend');
+    t.push('move_to_lay_on_table', 'move_previous_question');
+  }
+  return t;
+}
+const voteFormLegal = () => S.phase === 'S2' && !S.amendPending;
+
+// ---- 4. Registration engine. Removal is abort() — there is no unregisterTool. ----
+const live = new Map(); // name -> AbortController
+
+async function sync() {
+  const want = new Set(legalTools());
+
+  for (const [name, ctrl] of live) {
+    if (!want.has(name)) { ctrl.abort(); live.delete(name); log(`  - abort  ${name}`); }
+  }
+  for (const name of want) {
+    if (live.has(name)) continue;
+    const def = T[name];
+    const ctrl = new AbortController();
+    live.set(name, ctrl);
+    await mc.registerTool({
+      name,
+      description: def.description,
+      inputSchema: def.inputSchema,
+      annotations: def.annotations,
+      async execute(input, options) {
+        if (options?.signal?.aborted) throw new Error('aborted before execution');
+        log(`[call] ${name}(${JSON.stringify(input ?? {})})`);
+        const out = def.run(input ?? {});
+        await sync();
+        render();
+        return out; // executeTool resolves to DOMString — return a string.
+      }
+    }, { signal: ctrl.signal });
+    log(`  + register ${name}`);
+  }
+
+  // The declarative half: presence of @toolname IS the registration.
+  const f = document.getElementById('voteform');
+  if (voteFormLegal()) {
+    if (!f.hasAttribute('toolname')) { f.setAttribute('toolname', 'record_vote'); log('  + form toolname=record_vote'); }
+  } else if (f.hasAttribute('toolname')) {
+    f.removeAttribute('toolname'); log('  - form toolname REMOVED');
+  }
+}
+
+document.getElementById('voteform').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const d = new FormData(e.target);
+  log(`[call] record_vote(ayes=${d.get('ayes')}, nays=${d.get('nays')}) agentInvoked=${e.agentInvoked ?? 'undefined'}`);
+  const ayes = Number(d.get('ayes')), nays = Number(d.get('nays'));
+  const msg = `Vote recorded: ${ayes} ayes, ${nays} nays. The motion is ${ayes > nays ? 'ADOPTED' : 'LOST'}.`;
+  S.phase = 'S0'; S.motion = S.mover = S.seconder = S.amendment = null; S.amendPending = false;
+  if (e.respondWith) e.respondWith(msg);
+  sync().then(render);
+});
+
+// ---- 5. Live getTools() dump — the browser's answer, not our bookkeeping. ----
+async function render() {
+  document.getElementById('state').textContent = describe();
+  const el = document.getElementById('tools');
+  try {
+    const tools = await mc.getTools();
+    const names = tools.map(t => t.name).sort();
+    const expected = legalTools().concat(voteFormLegal() ? ['record_vote'] : []).sort();
+    el.textContent =
+      `getTools()  : ${names.join(', ') || '(none)'}\n` +
+      `expected    : ${expected.join(', ')}\n` +
+      `DIVERGENCE  : ${JSON.stringify(names) === JSON.stringify(expected) ? 'none' : 'YES — investigate'}`;
+  } catch (err) { el.textContent = 'getTools() threw: ' + err; }
+}
+
+// toolchange is what a client must be listening to. We listen too, to prove it fires.
+mc?.addEventListener?.('toolchange', () => { log('[toolchange] fired'); render(); });
+
+if (mc && 'registerTool' in mc) { await sync(); await render(); }
+</script>
