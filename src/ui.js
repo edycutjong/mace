@@ -34,10 +34,20 @@ const ronrFor = (name) => {
 
 let pathCtl = null;   // the EXECUTION signal for a running explain_path_to
 
+/**
+ * Renders of the left column are ASYNC (getTools() is a promise) and are triggered
+ * from three places at once — commit()'s emit, the deferred syncRegistration's
+ * emit, and the toolchange listener. Clearing the host BEFORE the await let two
+ * in-flight renders each clear and then each append, so the panel showed the tool
+ * list two to ten times over while the count badge showed it once. Nothing may
+ * touch the DOM until getTools() has answered, and a render that has been
+ * superseded while awaiting must drop its result on the floor.
+ */
+let renderSeq = 0;
+
 // ── left column: the API's own answer ───────────────────────────────────────
 async function renderInOrder() {
-  const host = $('in-order');
-  host.replaceChildren();
+  const token = ++renderSeq;
 
   let names, annotations = new Map();
   if (hasWebMCP) {
@@ -47,7 +57,9 @@ async function renderInOrder() {
   } else {
     names = [...legalTools(getState()), ...ALWAYS_ON_READS.map(r => r.toolName)].sort();
   }
+  if (token !== renderSeq) return;      // a newer render is already authoritative
 
+  const host = document.createDocumentFragment();
   for (const name of names) {
     const row = ROWS.get(name);
     const item = el('li', 'tool');
@@ -70,6 +82,7 @@ async function renderInOrder() {
     host.append(item);
   }
 
+  $('in-order').replaceChildren(host);   // one atomic swap, after the API answered
   $('in-order-count').textContent = String(names.length);
 }
 
@@ -162,8 +175,9 @@ function openRunner(name, row) {
   const state = getState();
 
   for (const [key, p] of props) {
+    const required = schema.required?.includes(key) ?? false;
     const wrap = el('label', 'field');
-    wrap.append(el('span', 'field-name', key + (schema.required?.includes(key) ? ' *' : '')));
+    wrap.append(el('span', 'field-name', key + (required ? ' *' : '')));
     wrap.append(el('span', 'field-desc', p.description ?? ''));
     let input;
     if (p.enum || p.enumFromTable) {
@@ -180,6 +194,12 @@ function openRunner(name, row) {
       }
     }
     input.name = key;
+    // The tool's own validate() throws a sentence that tells the agent how to
+    // retry — but Chrome collapses a throw from inside execute() into "Failed to
+    // parse input arguments", so a human who submits this dialog with a required
+    // field empty saw nothing useful. Marking the field required stops the submit
+    // in the browser, before executeTool is ever reached.
+    if (required) input.required = true;
     wrap.append(input);
     form.append(wrap);
   }
@@ -187,6 +207,20 @@ function openRunner(name, row) {
 
   form.dataset.tool = name;
   dlg.showModal();
+}
+
+/**
+ * enter_motion_text carries no toolautosubmit on purpose: executeTool fills the
+ * clerk's form and focuses it, and the call stays pending until a HUMAN clicks
+ * "State the question". That is the product's argument — but an output box left
+ * reading "running…" forever looks like a hang, so the dialog says what it is
+ * waiting for.
+ */
+function awaitsAHuman(name) {
+  const row = ROWS.get(name);
+  if (row?.kind !== 'declarative') return false;
+  const form = document.querySelector(`form[toolname="${name}"]`);
+  return !!form && !form.hasAttribute('toolautosubmit');
 }
 
 async function runFromDialog(e) {
@@ -198,7 +232,9 @@ async function runFromDialog(e) {
 
   pathCtl = new AbortController();
   $('runner-stop').hidden = name !== 'explain_path_to';
-  out.textContent = 'running…';
+  out.textContent = awaitsAHuman(name)
+    ? 'running… this tool carries no toolautosubmit: it fills the clerk\'s form and focuses it, and the call stays pending until a human clicks "State the question" on the bench.'
+    : 'running…';
   try {
     const res = await runTool(name, data, { signal: pathCtl.signal });
     out.textContent = res;

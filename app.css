@@ -7,15 +7,30 @@
   --surface-2: #1B2237;
   --line:      #26304B;
   --text:      #E8ECF5;
-  --muted:     #7A87A2;
+  /* #7A87A2 measured 4.37:1 on --surface-2 and 3.6:1 once .hint/.tool-blocked
+     opacity was composited in — under AA for the 11px sizes it is used at.
+     This value clears 4.5:1 against ALL THREE backgrounds below. */
+  --muted:     #8A97B2;
   --gold:      #E6C868;
   --green:     #6FCF97;
   --red:       #E07A6F;
+  --t-fast: .14s ease;      /* colour/border feedback  */
+  --t-press: .08s ease;     /* the press                */
   --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
 }
 
 * { box-sizing: border-box; }
+
+/* ── member-authored text is arbitrary ──────────────────────────────────────
+   A motion may quote a URL, a lot number or a 200-character unbroken token, and
+   the clerk's duty is to transcribe it in full. Every surface that renders text
+   the assembly supplied therefore breaks INSIDE a word rather than pushing the
+   bench sideways. Measured: one 265-character token took the page to 1971px at
+   a 390px viewport before this rule existed. */
+.frame-text, .frame-meta, .tabled, .minutes, .runner-out, .bench-note,
+.tool-name, .tool-title, .why, .ledger, .ledger-diff, .d-add, .d-rem,
+.runner-desc, .field-desc, .empty { overflow-wrap: anywhere; }
 
 body {
   margin: 0;
@@ -50,7 +65,8 @@ h2 {
   text-transform: uppercase; letter-spacing: .09em; color: var(--muted);
 }
 h2:first-of-type { margin-top: 0; }
-.hint { text-transform: none; letter-spacing: 0; font-weight: 400; font-size: .74rem; color: var(--muted); opacity: .8; }
+/* No opacity here: .8 over --muted composited to 3.7:1, under AA at .74rem. */
+.hint { text-transform: none; letter-spacing: 0; font-weight: 400; font-size: .74rem; color: var(--muted); }
 
 /* ── state bar ──────────────────────────────────────────────────────────── */
 .statebar {
@@ -87,7 +103,6 @@ h2:first-of-type { margin-top: 0; }
 .chair-btn {
   width: 100%; padding: .6rem; font-size: .86rem; font-weight: 600;
   background: var(--gold); color: #1A1405; border: 0; border-radius: 6px; cursor: pointer;
-  transition: filter .12s ease, transform .08s ease;
 }
 .chair-btn:hover:not(:disabled) { filter: brightness(1.1); }
 .chair-btn:active:not(:disabled) { transform: translateY(1px); }
@@ -115,6 +130,10 @@ input, textarea, select, button {
 input, textarea, select {
   width: 100%; padding: .4rem .5rem; background: var(--bg); color: var(--text);
   border: 1px solid var(--line); border-radius: 5px;
+  transition: border-color var(--t-fast), background var(--t-fast);
+}
+input:hover:not(:disabled), textarea:hover:not(:disabled), select:hover:not(:disabled) {
+  border-color: var(--muted); background: var(--surface);
 }
 input:focus-visible, textarea:focus-visible, select:focus-visible, button:focus-visible {
   outline: 2px solid var(--gold); outline-offset: 2px;
@@ -122,13 +141,26 @@ input:focus-visible, textarea:focus-visible, select:focus-visible, button:focus-
 .card button[type=submit], .attendance button {
   margin-top: .6rem; padding: .45rem .9rem; background: var(--surface-2); color: var(--text);
   border: 1px solid var(--line); border-radius: 5px; cursor: pointer; font-weight: 600;
-  transition: background .12s ease, border-color .12s ease;
 }
-.card button[type=submit]:hover:not(:disabled), .attendance button:hover { background: var(--line); border-color: var(--gold); }
+.card button[type=submit]:hover:not(:disabled), .attendance button:hover:not(:disabled) { background: var(--line); border-color: var(--gold); }
+
+/* ── ONE press affordance for every button on the bench ─────────────────────
+   Buttons here are styled by six different rules; the press was only on one of
+   them. This is the shared one, guarded so a disabled control never moves. */
+button { transition: filter var(--t-fast), background var(--t-fast), border-color var(--t-fast), transform var(--t-press); }
+button:active:not(:disabled) { transform: translateY(1px) scale(.99); }
+button:disabled { cursor: not-allowed; }
+
+/* Text links: quiet by default, brighter on hover, and they press too. */
+a { transition: color var(--t-fast), opacity var(--t-fast); }
+a:hover { color: var(--text); }
+a:active { opacity: .7; }
 
 /* A form whose toolname attribute has been removed. The visual state and the
-   registration state are driven by the same rule() call. */
-.card.is-out-of-order { opacity: .42; }
+   registration state are driven by the same rule() call. Every control inside is
+   genuinely disabled (declarative.js), so this is an inactive component — but
+   .42 was low enough to lose the heading, hence .58. */
+.card.is-out-of-order { opacity: .58; }
 .card.is-out-of-order .tool-tag { color: var(--red); background: rgba(224,122,111,.1); text-decoration: line-through; }
 
 /* The agent's own lifecycle on a declarative form, styled rather than left at the
@@ -161,7 +193,7 @@ form:--tool-form-active, form:has(:--tool-submit-active) { box-shadow: 0 0 0 2px
   padding: .3rem .6rem; background: var(--surface-2); color: var(--text);
   border: 1px solid var(--line); border-radius: 5px; cursor: pointer; font-size: .76rem;
 }
-.checkpoints button:hover { border-color: var(--gold); }
+.checkpoints button:hover:not(:disabled) { border-color: var(--gold); background: var(--line); }
 
 .cols { display: grid; grid-template-columns: 1fr 1fr; gap: .9rem; }
 @media (max-width: 620px) { .cols { grid-template-columns: 1fr; } }
@@ -170,12 +202,17 @@ form:--tool-form-active, form:has(:--tool-submit-active) { box-shadow: 0 0 0 2px
 .src { font-size: .68rem; color: var(--muted); margin: 0 0 .5rem; line-height: 1.4; }
 .src code { color: var(--gold); font-size: .95em; }
 
+/* Chrome makes an overflow:auto box with no focusable children a tab stop. Both
+   lists and the minute book are therefore named regions with a visible ring. */
 .tools { list-style: none; margin: 0; padding: 0; max-height: 30rem; overflow: auto; }
+.tools:focus-visible, .minutes:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 .tool {
   border: 1px solid var(--line); border-left: 2px solid var(--green);
   border-radius: 5px; padding: .4rem .5rem; margin-bottom: .35rem; background: var(--bg);
 }
-.tool-blocked { border-left-color: var(--red); opacity: .78; }
+/* "Out of order — and why" is a headline surface, so it may not be dimmed below
+   AA: the red rule and the strike-through carry the state, not a global opacity. */
+.tool-blocked { border-left-color: var(--red); }
 .tool-head { display: flex; align-items: baseline; gap: .35rem; flex-wrap: wrap; }
 .tool-name { font: .74rem/1.3 var(--mono); color: var(--text); }
 .tool-blocked .tool-name { text-decoration: line-through; text-decoration-color: var(--red); color: var(--muted); }
@@ -188,7 +225,6 @@ form:--tool-form-active, form:has(:--tool-submit-active) { box-shadow: 0 0 0 2px
 .do {
   margin-top: .35rem; padding: .2rem .45rem; font-size: .7rem; cursor: pointer;
   background: transparent; color: var(--gold); border: 1px solid var(--line); border-radius: 4px;
-  transition: background .12s ease, border-color .12s ease;
 }
 .do:hover { background: rgba(230,200,104,.1); border-color: var(--gold); }
 

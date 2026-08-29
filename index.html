@@ -50,7 +50,7 @@
   </div>
 
   <h2>The motion stack</h2>
-  <ol id="stack" class="stack"></ol>
+  <ol id="stack" class="stack" aria-label="The motion stack"></ol>
 
   <div class="chair-acts">
     <!-- mace reserves to a HUMAN every act that puts words before the assembly:
@@ -110,10 +110,10 @@
     <button type="submit">Record the vote</button>
   </form>
 
-  <p id="bench-note" class="bench-note"></p>
+  <p id="bench-note" class="bench-note" role="status" aria-live="polite"></p>
 
   <h2>The minute book <span class="hint">§48 — corrections are appended, never overwritten</span></h2>
-  <pre id="minutes" class="minutes"></pre>
+  <pre id="minutes" class="minutes" tabindex="0" role="region" aria-label="The minute book"></pre>
 </section>
 
 <!-- ═══ RIGHT: the panel that IS the toolchange listener ══════════════════ -->
@@ -135,12 +135,12 @@
     <div class="col">
       <h3>In order <span id="in-order-count" class="count">0</span></h3>
       <p class="src">rendered from <code>document.modelContext.getTools()</code> — the API's own return value, not our bookkeeping</p>
-      <ul id="in-order" class="tools"></ul>
+      <ul id="in-order" class="tools" aria-label="Tools in order now"></ul>
     </div>
     <div class="col">
       <h3>Out of order — and why <span id="out-of-order-count" class="count">0</span></h3>
       <p class="src">rendered from <code>rule()</code>, each row citing the rule that removes it</p>
-      <ul id="out-of-order" class="tools"></ul>
+      <ul id="out-of-order" class="tools" tabindex="0" role="region" aria-label="Acts that are out of order, and the rule that removes each"></ul>
     </div>
   </div>
 </aside>
@@ -149,7 +149,7 @@
 
 <datalist id="members"></datalist>
 
-<dialog id="runner" class="runner">
+<dialog id="runner" class="runner" aria-labelledby="runner-title" aria-describedby="runner-desc">
   <h3 id="runner-title"></h3>
   <p id="runner-desc" class="runner-desc"></p>
   <form id="runner-form" class="runner-form"></form>
