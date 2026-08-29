@@ -192,8 +192,16 @@ async function sync() {
         if (options?.signal?.aborted) throw new Error('aborted before execution');
         log(`[call] ${name}(${JSON.stringify(input ?? {})})`);
         const out = def.run(input ?? {});
-        await sync();
-        render();
+        // DEFERRED ON PURPOSE — do not await sync() here.
+        // Most tools make themselves illegal (move_main_motion takes S0->S1, so
+        // move_main_motion is no longer in order). Calling sync() inline aborts
+        // THIS tool's own AbortController while THIS execute callback is still
+        // running. Chrome then fails the in-flight call with "operation failed
+        // for an unknown transient reason", and the agent's now-stale handle
+        // fails the retry with "The provided value is not of type
+        // 'RegisteredTool'". Measured against gemini-3.6-flash, 2026-08-29.
+        // The frontier must only change AFTER the call that changed it settles.
+        setTimeout(() => { sync().then(render); }, 0);
         return out; // executeTool resolves to DOMString — return a string.
       }
     }, { signal: ctrl.signal });
