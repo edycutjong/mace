@@ -1,0 +1,259 @@
+/**
+ * ui.js — the clerk's bench, and the panel that IS the toolchange listener.
+ *
+ * "What is in order now" is the PRIMARY UI ELEMENT of this product, not a debug
+ * affordance and never an inspector. Its left column is rendered from
+ * `document.modelContext.getTools()` — the API's own return value, not our
+ * bookkeeping — and its right column is rendered from rule(), each row citing the
+ * rule that blocks it. Putting the invisible mechanism on screen as the product's
+ * main surface is the whole design.
+ */
+
+import {
+  hasWebMCP, contextSource, modelContext, ledger, onChange, getState, getEvents,
+  commit, runTool, outOfOrder, replayLog, start
+} from './webmcp.js';
+import { legalTools } from './rule.js';
+import { MOTIONS, GATED_TOOLS, ALWAYS_ON_READS } from './ronr.data.js';
+import { draftMinutes } from './minutes.js';
+import { SEED, CHECKPOINTS, MEMBERS } from './seed.js';
+
+const $ = (id) => document.getElementById(id);
+const el = (tag, cls, text) => {
+  const n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text != null) n.textContent = text;
+  return n;
+};
+
+const ROWS = new Map([...GATED_TOOLS, ...ALWAYS_ON_READS].map(r => [r.toolName, r]));
+const ronrFor = (name) => {
+  const row = ROWS.get(name);
+  return row?.motion ? MOTIONS[row.motion]?.ronr : null;
+};
+
+let pathCtl = null;   // the EXECUTION signal for a running explain_path_to
+
+// ── left column: the API's own answer ───────────────────────────────────────
+async function renderInOrder() {
+  const host = $('in-order');
+  host.replaceChildren();
+
+  let names, annotations = new Map();
+  if (hasWebMCP) {
+    const tools = await modelContext.getTools();
+    names = tools.map(t => t.name).sort();
+    tools.forEach(t => annotations.set(t.name, t.annotations ?? {}));
+  } else {
+    names = [...legalTools(getState()), ...ALWAYS_ON_READS.map(r => r.toolName)].sort();
+  }
+
+  for (const name of names) {
+    const row = ROWS.get(name);
+    const item = el('li', 'tool');
+    const head = el('div', 'tool-head');
+    head.append(el('span', 'tool-name', name));
+    const s = ronrFor(name);
+    if (s) head.append(el('span', 'ronr', s));
+
+    const a = annotations.get(name) ?? {};
+    if (a.readOnlyHint) head.append(el('span', 'badge badge-read', 'readOnly'));
+    if (a.untrustedContentHint) head.append(el('span', 'badge badge-untrusted', 'untrusted'));
+    if (!hasWebMCP && row?.untrusted) head.append(el('span', 'badge badge-untrusted', 'untrusted'));
+
+    item.append(head);
+    item.append(el('div', 'tool-title', row?.title ?? name));
+
+    const btn = el('button', 'do', '▷ do this');
+    btn.onclick = () => openRunner(name, row);
+    item.append(btn);
+    host.append(item);
+  }
+
+  $('in-order-count').textContent = String(names.length);
+}
+
+// ── right column: rule(), with the citation that blocks each act ────────────
+function renderOutOfOrder() {
+  const host = $('out-of-order');
+  host.replaceChildren();
+  const blocked = outOfOrder(getState());
+  for (const f of blocked) {
+    const item = el('li', 'tool tool-blocked');
+    const head = el('div', 'tool-head');
+    head.append(el('span', 'tool-name', f.toolName));
+    if (f.ronr) head.append(el('span', 'ronr', f.ronr));
+    item.append(head);
+    item.append(el('div', 'why', f.reason));
+    host.append(item);
+  }
+  $('out-of-order-count').textContent = String(blocked.length);
+}
+
+// ── the ledger: three claims collapsed into one number a judge reads ────────
+function renderLedger() {
+  const parts = [`toolchange ×${ledger.count}`];
+  if (ledger.added.length || ledger.removed.length) {
+    parts.push(`+${ledger.added.length} −${ledger.removed.length}`);
+  }
+  if (ledger.at) parts.push(ledger.at);
+  parts.push(`${ledger.total} tools in order`);
+  $('ledger').textContent = parts.join('  ·  ');
+
+  const diff = $('ledger-diff');
+  diff.replaceChildren();
+  ledger.added.forEach(n => diff.append(el('span', 'd-add', `+${n}`)));
+  ledger.removed.forEach(n => diff.append(el('span', 'd-rem', `−${n}`)));
+}
+
+// ── the bench ───────────────────────────────────────────────────────────────
+function renderBench() {
+  const s = getState();
+  $('phase').textContent = s.phase.replace(/_/g, ' ').toLowerCase();
+  $('phase').dataset.phase = s.phase;
+  $('present').textContent = String(s.present);
+  $('quorum-state').textContent = s.present >= s.quorum ? 'quorum present' : 'QUORUM ABSENT (§40)';
+  $('quorum-state').classList.toggle('absent', s.present < s.quorum);
+
+  const stack = $('stack');
+  stack.replaceChildren();
+  if (!s.stack.length) {
+    stack.append(el('li', 'empty', 'The floor is clear.'));
+  } else {
+    s.stack.forEach((it, i) => {
+      const last = i === s.stack.length - 1;
+      const li = el('li', `frame${last ? ' pending' : ''}`);
+      li.style.marginLeft = `${i * 14}px`;
+      const h = el('div', 'frame-head');
+      h.append(el('span', 'frame-motion', MOTIONS[it.motion]?.title ?? it.motion));
+      h.append(el('span', 'ronr', MOTIONS[it.motion]?.ronr ?? ''));
+      if (MOTIONS[it.motion]?.attested === 'simplified') h.append(el('span', 'badge badge-simplified', 'simplified'));
+      li.append(h);
+      li.append(el('div', 'frame-text', `"${it.text}"`));
+      li.append(el('div', 'frame-meta',
+        `moved by ${it.mover ?? '—'}${it.seconder ? ` · seconded by ${it.seconder}` : ' · AWAITING A SECOND'}${last ? ' · immediately pending' : ''}`));
+      stack.append(li);
+    });
+  }
+
+  const table = $('table-list');
+  table.replaceChildren();
+  if (!s.table.length) table.append(el('li', 'empty', 'Nothing on the table.'));
+  else s.table.forEach(t => table.append(el('li', 'tabled', `${t.id} — "${t.series[0]?.text ?? ''}"`)));
+
+  // The chair's two reserved acts. Labelled bench controls, logged by name —
+  // mace reserves to a human every act that puts words before the assembly.
+  $('put-question').disabled = !(s.phase === 'OPEN' && s.stack[s.stack.length - 1]?.seconder);
+
+  $('minutes').textContent = draftMinutes(getEvents(), s);
+}
+
+// ── "▷ do this" — a mini-form generated from the tool's own inputSchema ─────
+function openRunner(name, row) {
+  const dlg = $('runner');
+  const form = $('runner-form');
+  form.replaceChildren();
+  $('runner-title').textContent = row?.title ?? name;
+  $('runner-desc').textContent = row?.agentDescription ?? '';
+  $('runner-out').textContent = '';
+
+  const schema = row?.paramSchema ?? { properties: {} };
+  const props = Object.entries(schema.properties ?? {});
+  const state = getState();
+
+  for (const [key, p] of props) {
+    const wrap = el('label', 'field');
+    wrap.append(el('span', 'field-name', key + (schema.required?.includes(key) ? ' *' : '')));
+    wrap.append(el('span', 'field-desc', p.description ?? ''));
+    let input;
+    if (p.enum || p.enumFromTable) {
+      input = el('select');
+      const opts = p.enum ?? state.table.map(t => t.id);
+      opts.forEach(o => { const op = el('option', null, o); op.value = o; input.append(op); });
+    } else if (p.type === 'integer') {
+      input = el('input'); input.type = 'number'; input.min = String(p.minimum ?? 0);
+      if (key === 'present') input.value = String(state.present);
+    } else {
+      input = el('input'); input.type = 'text';
+      if (key === 'mover' || key === 'seconder' || key === 'raisedBy' || key === 'ruledBy' || key === 'chair') {
+        input.setAttribute('list', 'members');
+      }
+    }
+    input.name = key;
+    wrap.append(input);
+    form.append(wrap);
+  }
+  if (!props.length) form.append(el('p', 'field-desc', 'This tool takes no parameters.'));
+
+  form.dataset.tool = name;
+  dlg.showModal();
+}
+
+async function runFromDialog(e) {
+  e.preventDefault();
+  const form = $('runner-form');
+  const name = form.dataset.tool;
+  const data = Object.fromEntries(new FormData(form).entries());
+  const out = $('runner-out');
+
+  pathCtl = new AbortController();
+  $('runner-stop').hidden = name !== 'explain_path_to';
+  out.textContent = 'running…';
+  try {
+    const res = await runTool(name, data, { signal: pathCtl.signal });
+    out.textContent = res;
+  } catch (err) {
+    out.textContent = String(err.message ?? err);
+  } finally {
+    $('runner-stop').hidden = true;
+    pathCtl = null;
+  }
+}
+
+// ── boot ────────────────────────────────────────────────────────────────────
+async function renderAll() {
+  await renderInOrder();
+  renderOutOfOrder();
+  renderLedger();
+  renderBench();
+}
+
+export async function boot() {
+  // The members datalist, so every name field offers the actual roster.
+  const dl = $('members');
+  MEMBERS.forEach(m => { const o = el('option'); o.value = m; dl.append(o); });
+
+  onChange(() => { renderAll(); });
+
+  const info = await start();
+
+  // THE PANEL IS THE TOOLCHANGE LISTENER. Not a listener the panel happens to
+  // have — the event is what drives the product's main surface.
+  if (hasWebMCP) {
+    modelContext.addEventListener('toolchange', () => { renderAll(); });
+    $('mcp-state').textContent = `WebMCP live · ${info.contextSource}`;
+    $('mcp-state').classList.add('ok');
+  } else {
+    $('mcp-state').textContent = 'WebMCP not detected — this panel is rendering from the state machine. With WebMCP it renders from document.modelContext.getTools().';
+    $('mcp-state').classList.add('degraded');
+  }
+
+  // ── the chair's reserved bench acts ──────────────────────────────────────
+  $('put-question').onclick = () => commit('put_the_question', {}, 'chair');
+  $('attendance').onsubmit = (e) => {
+    e.preventDefault();
+    const n = Number(new FormData(e.target).get('present'));
+    const note = String(new FormData(e.target).get('note') ?? '');
+    commit('set_members_present', { present: n, note }, 'chair');
+  };
+
+  $('runner-form').onsubmit = runFromDialog;
+  $('runner-stop').onclick = () => pathCtl?.abort();
+  $('runner-close').onclick = () => $('runner').close();
+
+  $('reset').onclick = () => replayLog([]);
+  $('load-tangle').onclick = () => replayLog(SEED.slice(0, CHECKPOINTS.TANGLE));
+  $('load-widest').onclick = () => replayLog(SEED.slice(0, CHECKPOINTS.WIDEST));
+
+  await renderAll();
+}

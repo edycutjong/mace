@@ -121,6 +121,12 @@ export const THRESHOLDS = Object.freeze({
  * `agentDescription` is written FOR A MODEL: it says what the tool does, when to
  * choose it over its siblings, and — where two readings exist — which one this
  * tool means. The D1 kill test measured these descriptions directly.
+ *
+ * `paramSchema` is JSON Schema. Every property carries its own `description`,
+ * because a described property is the difference between a model guessing and a
+ * model knowing. Where the STATE carries the valid values — `move_to_take_from_table`'s
+ * `motionId` — the enum is injected at registration time by `webmcp.js`, so the
+ * schema itself carries the state. No logic lives in this file to do it.
  */
 export const GATED_TOOLS = Object.freeze([
   {
@@ -128,7 +134,14 @@ export const GATED_TOOLS = Object.freeze([
     phases: ['PRE_MEETING'], guard: 'quorumPresent',
     title: 'Call the meeting to order',
     agentDescription: 'Opens the meeting so business can be transacted. In order only before the meeting has started and only when enough members are present to meet quorum.',
-    paramSchema: { type: 'object', properties: {} }
+    paramSchema: {
+      type: 'object',
+      properties: {
+        chair: { type: 'string', description: 'Name of the presiding officer, exactly as it will appear in the minutes.' },
+        at: { type: 'string', description: 'The time the gavel fell, raw as spoken — for example "7:04". Do not convert or reformat it.' }
+      },
+      required: ['chair', 'at']
+    }
   },
   {
     toolName: 'move_main_motion', motion: 'main', kind: 'imperative',
@@ -138,7 +151,7 @@ export const GATED_TOOLS = Object.freeze([
     paramSchema: {
       type: 'object',
       properties: {
-        text: { type: 'string', description: 'The wording of the motion as moved.' },
+        text: { type: 'string', description: 'The wording of the motion as moved, quoted verbatim, without renaming or classifying it.' },
         mover: { type: 'string', description: 'Name of the member who moved it.' }
       },
       required: ['text', 'mover']
@@ -148,7 +161,7 @@ export const GATED_TOOLS = Object.freeze([
     toolName: 'second_pending_motion', motion: null, kind: 'imperative',
     phases: ['AWAITING_SECOND'], guard: null,
     title: 'Second the pending motion',
-    agentDescription: 'Records a second for the motion that is pending but not yet seconded. After this the motion is open to debate and amendment.',
+    agentDescription: 'Records a second for the motion that is pending but not yet seconded. After this the motion is open to debate and amendment — unless the motion is undebatable, in which case the chair puts it to a vote at once.',
     paramSchema: {
       type: 'object',
       properties: { seconder: { type: 'string', description: 'Name of the member who seconded.' } },
@@ -163,11 +176,11 @@ export const GATED_TOOLS = Object.freeze([
     paramSchema: {
       type: 'object',
       properties: {
-        text: { type: 'string', description: 'The proposed new wording, or the change requested.' },
+        text: { type: 'string', description: 'The proposed new wording, or the change requested, in the mover’s own words.' },
         mover: { type: 'string', description: 'Name of the member moving the amendment.' },
         form: { type: 'string', enum: ['insert', 'strike', 'strike_and_insert', 'substitute'], description: 'The form of the amendment. A substitute is treated procedurally as an ordinary first-degree amendment; RONR §12 special handling of amendments to a pending substitute is not implemented.' }
       },
-      required: ['text', 'mover']
+      required: ['text', 'mover', 'form']
     }
   },
   {
@@ -179,9 +192,10 @@ export const GATED_TOOLS = Object.freeze([
       type: 'object',
       properties: {
         text: { type: 'string', description: 'The proposed new wording of the amendment.' },
-        mover: { type: 'string', description: 'Name of the member moving it.' }
+        mover: { type: 'string', description: 'Name of the member moving it.' },
+        form: { type: 'string', enum: ['insert', 'strike', 'strike_and_insert', 'substitute'], description: 'The form of the second-degree amendment.' }
       },
-      required: ['text', 'mover']
+      required: ['text', 'mover', 'form']
     }
   },
   {
@@ -203,7 +217,7 @@ export const GATED_TOOLS = Object.freeze([
     paramSchema: {
       type: 'object',
       properties: {
-        committee: { type: 'string', description: 'The committee the question is referred to.' },
+        committee: { type: 'string', description: 'The committee the question is referred to, named aloud, verbatim.' },
         mover: { type: 'string', description: 'Name of the member moving it.' }
       },
       required: ['committee', 'mover']
@@ -217,10 +231,10 @@ export const GATED_TOOLS = Object.freeze([
     paramSchema: {
       type: 'object',
       properties: {
-        when: { type: 'string', description: 'The time or meeting the question is postponed to.' },
+        until: { type: 'string', description: 'The time or meeting the question is postponed to, as spoken — for example "the next regular meeting". Not a parsed date.' },
         mover: { type: 'string', description: 'Name of the member moving it.' }
       },
-      required: ['when', 'mover']
+      required: ['until', 'mover']
     }
   },
   {
@@ -231,7 +245,7 @@ export const GATED_TOOLS = Object.freeze([
     paramSchema: {
       type: 'object',
       properties: {
-        limit: { type: 'string', description: 'The limit or extension proposed, in plain words.' },
+        limit: { type: 'string', description: 'The limit or extension proposed, as spoken — for example "two minutes each".' },
         mover: { type: 'string', description: 'Name of the member moving it.' }
       },
       required: ['limit', 'mover']
@@ -266,10 +280,17 @@ export const GATED_TOOLS = Object.freeze([
     phases: ['FLOOR_CLEAR'], guard: 'somethingOnTable',
     title: 'Move to take from the table',
     agentDescription: 'Brings back a question that was previously laid on the table, together with everything that was adhering to it when it was set aside. In order only when the floor is clear and something is actually on the table.',
+    // `motionId` carries `enumFromTable`: webmcp.js regenerates the enum from
+    // state.table at every registration, so the agent is offered only motions
+    // that are genuinely on the table. The schema itself carries the state —
+    // the same thesis as the tool frontier, one level down.
     paramSchema: {
       type: 'object',
-      properties: { mover: { type: 'string', description: 'Name of the member moving it.' } },
-      required: ['mover']
+      properties: {
+        motionId: { type: 'string', enumFromTable: true, description: 'Which tabled question to bring back.' },
+        mover: { type: 'string', description: 'Name of the member moving it.' }
+      },
+      required: ['motionId', 'mover']
     }
   },
   {
@@ -293,24 +314,30 @@ export const GATED_TOOLS = Object.freeze([
     paramSchema: {
       type: 'object',
       properties: {
-        claim: { type: 'string', description: 'What the member says is out of order.' },
+        concern: { type: 'string', description: 'What the member says is out of order, in their own words.' },
         raisedBy: { type: 'string', description: 'Name of the member raising it.' }
       },
-      required: ['claim']
+      required: ['concern', 'raisedBy']
     }
   },
   {
     toolName: 'record_chair_ruling', motion: null, kind: 'imperative',
     phases: ['FLOOR_CLEAR', 'AWAITING_SECOND', 'OPEN', 'VOTE_PENDING', 'RULING_PENDING'], guard: null,
     title: "Record the chair's ruling",
-    agentDescription: 'Writes down the ruling the chair has already given out loud on a pending point of order. Only the human chair decides a ruling; this tool records a decision a person has made, it does not make one.',
+    // Registered OUTSIDE RULING_PENDING on purpose, so the chair can rule on
+    // germaneness (§12) or a lapsed second (§4) without a member first raising a
+    // point of order. Germaneness is the one judgement mace refuses to make, so
+    // the tool that carries it must be reachable whenever the chair needs it.
+    agentDescription: 'Writes down the ruling the chair has already given out loud. Only the human chair decides a ruling; this tool records a decision a person has made, it does not make one. There is no "not germane" verdict: a sustained germaneness point is ruling "well_taken" with disposition "strike_pending_motion".',
     paramSchema: {
       type: 'object',
       properties: {
-        ruling: { type: 'string', enum: ['well_taken', 'not_well_taken'], description: 'The chair ruling as spoken: well taken, or not well taken.' },
-        reason: { type: 'string', description: 'The chair stated reason, if given.' }
+        ruledBy: { type: 'string', description: "The chair's name, exactly as it will appear in the minutes." },
+        ruling: { type: 'string', enum: ['well_taken', 'not_well_taken', 'lapsed_for_want_of_second'], description: 'The chair ruling as spoken.' },
+        disposition: { type: 'string', enum: ['strike_pending_motion', 'none'], description: 'Whether the ruling removes the immediately pending motion from the stack. A motion that lapses for want of a second is by definition removed.' },
+        rationale: { type: 'string', description: "The chair's stated reason, in the chair's own words." }
       },
-      required: ['ruling']
+      required: ['ruledBy', 'ruling', 'disposition', 'rationale']
     }
   },
   {
@@ -322,9 +349,9 @@ export const GATED_TOOLS = Object.freeze([
       type: 'object',
       properties: {
         correction: { type: 'string', description: 'What the entry should say instead.' },
-        reason: { type: 'string', description: 'Why the correction is being made.' }
+        actor: { type: 'string', description: 'Who is making the correction.' }
       },
-      required: ['correction']
+      required: ['correction', 'actor']
     }
   },
   {
@@ -332,10 +359,14 @@ export const GATED_TOOLS = Object.freeze([
     phases: ['PRE_MEETING', 'FLOOR_CLEAR', 'AWAITING_SECOND', 'OPEN', 'VOTE_PENDING', 'RULING_PENDING'], guard: null,
     title: 'Set the number of members present',
     // R5/R10: this is REAL user input from the bench, never a debug toggle.
+    // The chair genuinely counts the room, in the same class as a chair ruling.
     agentDescription: 'Records how many members are currently in the room, as counted by the chair. If this falls below quorum, almost every motion stops being in order until it is restored.',
     paramSchema: {
       type: 'object',
-      properties: { present: { type: 'integer', minimum: 0, description: 'Number of members now in the room.' } },
+      properties: {
+        present: { type: 'integer', minimum: 0, description: 'Number of members now in the room.' },
+        note: { type: 'string', description: 'Who arrived or left, in the clerk’s own words — for example "Boyd, Raman and Nakamura left for the school-board meeting". Recorded in the minutes verbatim, never parsed.' }
+      },
       required: ['present']
     }
   },
@@ -343,25 +374,30 @@ export const GATED_TOOLS = Object.freeze([
     toolName: 'record_vote_tally', motion: null, kind: 'declarative',
     phases: ['VOTE_PENDING'], guard: null,
     title: 'Record the vote tally',
-    agentDescription: 'Records the counted result of the vote the chair has just taken on the pending question. In order only once the chair has put the question.',
+    agentDescription: 'Records the counted result of the vote the chair has just taken on the pending question, applies the threshold that motion requires, and returns whether it was adopted or lost. In order only once the chair has put the question.',
     paramSchema: {
       type: 'object',
       properties: {
-        ayes: { type: 'integer', minimum: 0, description: 'How many members voted in favour.' },
-        nays: { type: 'integer', minimum: 0, description: 'How many members voted against.' },
-        abstentions: { type: 'integer', minimum: 0, description: 'How many members abstained. Abstentions are excluded from the threshold arithmetic.' }
+        aye: { type: 'integer', minimum: 0, description: 'The number of members voting in the affirmative, as counted in the room.' },
+        nay: { type: 'integer', minimum: 0, description: 'The number of members voting in the negative, as counted in the room.' },
+        abstain: { type: 'integer', minimum: 0, description: 'The number of members present who declined to vote. Abstentions are recorded in the minutes but excluded from the threshold arithmetic.' }
       },
-      required: ['ayes', 'nays']
+      required: ['aye', 'nay']
     }
   },
   {
     toolName: 'enter_motion_text', motion: null, kind: 'declarative',
     phases: ['FLOOR_CLEAR', 'OPEN'], guard: null,
     title: 'Enter motion text',
-    agentDescription: 'Types the exact wording of a motion into the clerk bench, for a motion being moved or amended.',
+    // No toolautosubmit, deliberately: the tool fills and focuses the form, and a
+    // HUMAN clicks "State the question". The human-in-the-loop argument, in HTML.
+    agentDescription: "Puts the wording of a motion into the clerk's entry field and focuses it, ready for a person to state the question to the assembly. Use this to transcribe a motion exactly as it was spoken. This does not place the motion before the assembly — a human must click to do that.",
     paramSchema: {
       type: 'object',
-      properties: { text: { type: 'string', description: 'The wording, as the member said it.' } },
+      properties: {
+        text: { type: 'string', description: 'The exact words of the motion as spoken, quoted verbatim, without renaming or classifying it.' },
+        mover: { type: 'string', description: 'The name of the member who made the motion, as the clerk heard it.' }
+      },
       required: ['text']
     }
   }
@@ -387,9 +423,66 @@ export const SUBQUORUM_ALLOWED = Object.freeze(new Set([
   'set_members_present'     // §40 "take measures to obtain a quorum" — labelled simplified
 ]));
 
-/** The 4 always-on reads, registered in every phase. 19 gated + 4 = 23 tools. */
+/**
+ * The 4 always-on reads, registered in every phase, owned by `sessionCtl` and
+ * never touched by the registration diff. 19 gated + 4 = 23 tools.
+ *
+ * `untrustedContentHint` is set on exactly TWO of them and deliberately omitted
+ * on the other two, with the reason next to each. The contrast is the artifact:
+ * blanket-annotating everything says nothing. `annotations.test.js` asserts, for
+ * every tool declaring untrustedContentHint false, that its output against the
+ * poisoned seed contains no substring of any member-authored text — which turns
+ * the annotation into a checked contract rather than a decoration.
+ */
 export const ALWAYS_ON_READS = Object.freeze([
-  'get_motion_stack', 'get_minutes', 'explain_path_to', 'what_is_in_order_now'
+  {
+    toolName: 'get_motion_stack',
+    title: 'Get the motion stack',
+    agentDescription: 'Reports every question currently before the assembly, innermost last: what is immediately pending, what it adheres to, who moved and seconded each, and the RONR citation for each. Call this first when you are unsure what is going on.',
+    untrusted: true,
+    untrustedReason: 'Returns text fields typed by the clerk quoting members. Third-party content flowing back to the model.',
+    paramSchema: { type: 'object', properties: {}, required: [] }
+  },
+  {
+    toolName: 'draft_minutes',
+    title: 'Draft the minutes',
+    agentDescription: 'Produces the minute book as it currently stands: every event in order, with movers, seconders, chair rulings and vote tallies. Corrections appear as appended corrections, never as edits.',
+    untrusted: true,
+    untrustedReason: 'Embeds verbatim motion text and chair-ruling rationales.',
+    paramSchema: {
+      type: 'object',
+      properties: {
+        through: { type: 'string', description: "The point in the meeting to draft up to, in the clerk's own words, e.g. 'through the parking motion'. Omit for the whole meeting so far." }
+      },
+      required: []
+    }
+  },
+  {
+    toolName: 'explain_current_state',
+    title: 'Explain the current state',
+    agentDescription: 'Explains the procedural situation: which phase the meeting is in, how deep the stack is, whether a quorum is present, and what class of act is therefore in order. Describes procedure only — it never quotes what any member said.',
+    untrusted: false,
+    untrustedReason: 'Returns procedural description only: motion classes, phase, RONR citations. Never member-authored text. Asserted by annotations.test.js against the poisoned seed.',
+    paramSchema: { type: 'object', properties: {}, required: [] }
+  },
+  {
+    toolName: 'explain_path_to',
+    title: 'Explain the path to a goal',
+    agentDescription: 'Searches for a lawful sequence of motions that reaches a procedural goal from where the meeting actually stands, and returns it as a conditional plan that branches on how each vote goes. This is a real search and may take a moment; it can be stopped, and stopping it returns the best plan proved so far rather than nothing.',
+    untrusted: false,
+    untrustedReason: 'Returns motion ids and step names only. Never quoted text. Asserted by annotations.test.js against the poisoned seed.',
+    paramSchema: {
+      type: 'object',
+      properties: {
+        goal: {
+          type: 'string',
+          enum: ['vote_on_the_main_motion', 'dispose_of_pending_amendments', 'return_to_a_tabled_motion', 'end_debate_now', 'adjourn_cleanly'],
+          description: 'The procedural outcome the assembly wants to reach.'
+        }
+      },
+      required: ['goal']
+    }
+  }
 ]);
 
 /** Motions explicitly out of scope, with the reason. Rendered verbatim in SPEC.md. */

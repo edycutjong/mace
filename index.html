@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mace — the tool list is the agenda</title>
+<meta name="description" content="A clerk's bench for a meeting under Robert's Rules, where the registered WebMCP tool set IS the motion stack. An action that is out of order does not exist to be called.">
+
+<!-- Origin-trial token, delivered a SECOND way on purpose. netlify.toml sends it as an
+     Origin-Trial response header; this meta is the fallback for the case where the host
+     drops custom headers. Either alone is sufficient. It is a public, origin-bound
+     artifact and NOT a credential — see origin-trial.json. -->
+<meta http-equiv="origin-trial" content="Au5Mzo+rW6/1Nzha5ikPBg8vrwxF+sinJmpbzqOfYUyI7oWP2zE1UR//vNLb1K7utxQK5jkWHI0w6Mo+tYKjQwIAAABYeyJvcmlnaW4iOiJodHRwczovL3BvaW50b2ZvcmRlci5uZXRsaWZ5LmFwcDo0NDMiLCJmZWF0dXJlIjoiV2ViTUNQIiwiZXhwaXJ5IjoxNzk0ODczNjAwfQ==">
+
+<link rel="icon" href="docs/assets/favicon-32.png" sizes="32x32">
+<link rel="icon" href="docs/assets/favicon-16.png" sizes="16x16">
+<link rel="icon" href="docs/assets/favicon-48.png" sizes="48x48">
+<meta property="og:title" content="mace — the tool list is the agenda">
+<meta property="og:description" content="The registered WebMCP tool set IS the motion stack. An action that is out of order does not exist to be called.">
+<meta property="og:image" content="docs/assets/og-image.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <img src="docs/assets/icon.svg" alt="" width="30" height="30">
+    <div>
+      <h1>mace</h1>
+      <p class="tagline">The tool list is the agenda.</p>
+    </div>
+  </div>
+  <div class="top-right">
+    <p id="mcp-state" class="mcp-state">checking for WebMCP…</p>
+    <p class="assembly">Maple Ridge HOA · Board of 9 · quorum 5 · <em>RONR 12th ed.</em></p>
+  </div>
+</header>
+
+<main>
+
+<!-- ═══ LEFT: the bench ═══════════════════════════════════════════════════ -->
+<section class="bench">
+
+  <div class="statebar">
+    <span class="k">phase</span><span id="phase" class="phase">pre meeting</span>
+    <span class="k">present</span><span id="present" class="num">0</span>
+    <span id="quorum-state" class="quorum">quorum absent</span>
+  </div>
+
+  <h2>The motion stack</h2>
+  <ol id="stack" class="stack"></ol>
+
+  <div class="chair-acts">
+    <!-- mace reserves to a HUMAN every act that puts words before the assembly:
+         stating a motion, and putting a question to a vote. Every other act is a
+         tool. These are labelled bench controls, logged under the chair's name —
+         not debug toggles. -->
+    <button id="put-question" class="chair-btn">The chair puts the question</button>
+    <form id="attendance" class="attendance">
+      <label>Members in the room
+        <input name="present" type="number" min="0" max="9" value="7" required>
+      </label>
+      <label class="grow">Note for the minutes
+        <input name="note" type="text" placeholder="who arrived or left, in your words">
+      </label>
+      <button type="submit">Record attendance</button>
+    </form>
+  </div>
+
+  <h2>On the table <span class="hint">§34 — set aside, and survives intact</span></h2>
+  <ul id="table-list" class="table-list"></ul>
+
+  <h2>The clerk's forms <span class="hint">declarative tools — removed by deleting <code>toolname</code>, not by aborting a signal</span></h2>
+
+  <!-- NO toolautosubmit. The agent fills this; a HUMAN clicks. That is the
+       human-in-the-loop argument written in HTML rather than asserted in a README. -->
+  <form id="motion-entry" class="card"
+        toolname="enter_motion_text"
+        tooldescription="Puts the wording of a motion into the clerk's entry field and focuses it, ready for a person to state the question to the assembly. Use this to transcribe a motion exactly as it was spoken.">
+    <h3>Motion entry <span class="tool-tag">enter_motion_text</span></h3>
+    <label for="motion-text">Motion wording</label>
+    <textarea id="motion-text" name="text" rows="3"
+      toolparamdescription="The exact words of the motion as spoken, quoted verbatim, without renaming or classifying it."></textarea>
+    <label for="motion-mover">Moved by</label>
+    <input id="motion-mover" name="mover" list="members"
+      toolparamdescription="The name of the member who made the motion, as the clerk heard it.">
+    <button type="submit">State the question</button>
+  </form>
+
+  <!-- toolautosubmit + respondWith: recording a tally the chair already counted is
+       transcription, not judgement. THERE IS NO IMPERATIVE record_vote TOOL —
+       the vote IS the form. -->
+  <form id="vote-tally" class="card" toolautosubmit
+        toolname="record_vote_tally"
+        tooldescription="Records the counted ayes and nays on the question the chair has just put, applies the threshold that motion requires, and returns whether it was adopted or lost.">
+    <h3>Vote tally <span class="tool-tag">record_vote_tally</span></h3>
+    <div class="tally">
+      <label for="aye">Ayes
+        <input id="aye" name="aye" type="number" min="0" value="0"
+          toolparamdescription="The number of members voting in the affirmative, as counted in the room."></label>
+      <label for="nay">Nays
+        <input id="nay" name="nay" type="number" min="0" value="0"
+          toolparamdescription="The number of members voting in the negative, as counted in the room."></label>
+      <label for="abstain">Abstaining
+        <input id="abstain" name="abstain" type="number" min="0" value="0"
+          toolparamdescription="The number of members present who declined to vote, as counted in the room. Abstentions are recorded in the minutes but excluded from the threshold."></label>
+    </div>
+    <button type="submit">Record the vote</button>
+  </form>
+
+  <p id="bench-note" class="bench-note"></p>
+
+  <h2>The minute book <span class="hint">§48 — corrections are appended, never overwritten</span></h2>
+  <pre id="minutes" class="minutes"></pre>
+</section>
+
+<!-- ═══ RIGHT: the panel that IS the toolchange listener ══════════════════ -->
+<aside class="panel">
+  <div class="panel-head">
+    <h2>What is in order now</h2>
+    <p id="ledger" class="ledger">toolchange ×0</p>
+    <p id="ledger-diff" class="ledger-diff"></p>
+  </div>
+
+  <div class="checkpoints">
+    <span class="hint">Jump to a real frame of the meeting — each is a replay of the log, not a dressed screen:</span>
+    <button id="load-widest">Widest frontier</button>
+    <button id="load-tangle">The tangle</button>
+    <button id="reset">Reset</button>
+  </div>
+
+  <div class="cols">
+    <div class="col">
+      <h3>In order <span id="in-order-count" class="count">0</span></h3>
+      <p class="src">rendered from <code>document.modelContext.getTools()</code> — the API's own return value, not our bookkeeping</p>
+      <ul id="in-order" class="tools"></ul>
+    </div>
+    <div class="col">
+      <h3>Out of order — and why <span id="out-of-order-count" class="count">0</span></h3>
+      <p class="src">rendered from <code>rule()</code>, each row citing the rule that removes it</p>
+      <ul id="out-of-order" class="tools"></ul>
+    </div>
+  </div>
+</aside>
+
+</main>
+
+<datalist id="members"></datalist>
+
+<dialog id="runner" class="runner">
+  <h3 id="runner-title"></h3>
+  <p id="runner-desc" class="runner-desc"></p>
+  <form id="runner-form" class="runner-form"></form>
+  <div class="runner-actions">
+    <button form="runner-form" type="submit">▷ run</button>
+    <button id="runner-stop" type="button" hidden>■ stop</button>
+    <button id="runner-close" type="button">close</button>
+  </div>
+  <pre id="runner-out" class="runner-out"></pre>
+</dialog>
+
+<footer>
+  <p>
+    <a href="https://github.com/edycutjong/mace">source</a> ·
+    MIT ·
+    built for The WebMCP Challenge ·
+    every legality verdict traces to a cited row in <code>src/ronr.data.js</code>
+  </p>
+</footer>
+
+<script type="module">
+  import { boot } from './src/ui.js';
+  boot();
+</script>
+</body>
+</html>
