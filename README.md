@@ -26,6 +26,10 @@ where the registered WebMCP tool set <em>is</em> the motion stack.
 </p>
 
 <p align="center">
+  <a href="https://pointoforder.netlify.app"><b>Live&nbsp;→&nbsp;pointoforder.netlify.app</b></a>
+</p>
+
+<p align="center">
   <code>WebMCP</code> · <code>document.modelContext</code> · <code>AbortSignal</code> · <code>RONR 12th ed.</code> · <code>zero dependencies</code>
 </p>
 

@@ -1,12 +1,15 @@
 {
-  "name": "pointoforder",
+  "name": "mace",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "A clerk's bench for meetings run under Robert's Rules — the registered WebMCP tool set IS the motion stack.",
+  "description": "A clerk's bench for meetings run under Robert's Rules \u2014 the registered WebMCP tool set IS the motion stack.",
   "license": "MIT",
   "homepage": "https://pointoforder.netlify.app",
-  "repository": { "type": "git", "url": "https://github.com/edycutjong/pointoforder.git" },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/edycutjong/mace.git"
+  },
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest"
@@ -14,5 +17,7 @@
   "devDependencies": {
     "vitest": "^3.2.4"
   },
-  "engines": { "node": ">=20" }
+  "engines": {
+    "node": ">=20"
+  }
 }
