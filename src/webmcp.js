@@ -345,14 +345,19 @@ export async function runTool(name, input, { signal } = {}) {
   const tools = await modelContext.getTools();
   const tool = tools.find(t => t.name === name);
   if (!tool) return `${name} is not in order right now, so there is no tool to call.`;
+  // SETTLED EMPIRICALLY, Chrome 151, 2026-08-29 against this deploy.
+  //
+  // The normative IDL types executeTool's second argument as `object`; Chrome's
+  // imperative-API doc passes a JSON STRING. They disagree, so we measured it:
+  //   executeTool(tool, { goal: '…' })              -> UnknownError: Failed to parse input arguments
+  //   executeTool(tool, JSON.stringify({ goal:'…' })) -> resolves
+  // Chrome wants the string. We send the string first and keep the object path as
+  // the fallback, so mace stays correct against both readings and will not break
+  // when the implementation converges on the IDL.
   try {
-    // spec note: the normative IDL types executeTool's second argument as `object`,
-    // while Chrome's imperative-API doc passes a JSON string. mace sends the object
-    // and falls back to JSON.stringify on TypeError, so it is correct against both.
-    return await modelContext.executeTool(tool, input ?? {}, { signal });
+    return await modelContext.executeTool(tool, JSON.stringify(input ?? {}), { signal });
   } catch (e) {
-    if (e instanceof TypeError) return await modelContext.executeTool(tool, JSON.stringify(input ?? {}), { signal });
-    throw e;
+    return await modelContext.executeTool(tool, input ?? {}, { signal });
   }
 }
 
