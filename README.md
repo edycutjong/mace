@@ -27,7 +27,7 @@
   ![WebMCP](https://img.shields.io/badge/WebMCP-document.modelContext-C9A43A?style=flat)
   ![Vanilla JS](https://img.shields.io/badge/Vanilla_JS-no_build_step-F7DF1E?style=flat&logo=javascript&logoColor=black)
   ![Zero dependencies](https://img.shields.io/badge/runtime_deps-0-3ECF8E?style=flat)
-  ![Tests](https://img.shields.io/badge/tests-213_passing-3ECF8E?style=flat)
+  ![Tests](https://img.shields.io/badge/tests-306_passing-3ECF8E?style=flat)
   [![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
   [![CI](https://github.com/edycutjong/mace/actions/workflows/ci.yml/badge.svg)](https://github.com/edycutjong/mace/actions/workflows/ci.yml)
   [![Release](https://img.shields.io/github/v/release/edycutjong/mace?style=flat&color=C9A43A)](https://github.com/edycutjong/mace/releases)
@@ -112,7 +112,7 @@ business. No mace, no valid business. Here: **no tool, not in order.**
 | Runtime | **Vanilla ES modules**, no framework | The file in this repo is byte-identical to the file the browser executes |
 | Build | **None** | No bundler, no transpile — nothing between the source and the judge |
 | Rules | `ronr.data.js` — RONR 12th ed. as data, zero logic | Adding a motion type is adding a table row, not writing a tool |
-| Tests | **Vitest**, 213 tests | The legality grid is pure data, so it is exhaustively testable |
+| Tests | **Vitest**, 306 tests | The legality grid is pure data, so it is exhaustively testable |
 | Host | **Netlify** + Chrome origin trial | Headers and token bound to one frozen origin |
 
 No framework, no bundler, no transpile: **the file you open in this repo is byte-identical to

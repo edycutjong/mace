@@ -35,7 +35,7 @@ jobs:
       - name: vitest
         run: npx vitest run
 
-      # Runs the same 213+ tests again under the v8 coverage provider and
+      # Runs the same 306+ tests again under the v8 coverage provider and
       # enforces the per-file 100% thresholds set in vitest.config.js for the
       # seven pure-logic modules (rule/fsm/effects/path/minutes/ronr.data/seed).
       # ui.js, webmcp.js and declarative.js are deliberately excluded there —

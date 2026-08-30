@@ -42,7 +42,7 @@ Measured against the live deploy in Chrome 151.0.7922.171. Not estimated.
 | `getTools()` at the four checkpoints | **5 / 17 / 15 / 9** | identical to the on-screen count; zero divergence |
 | Tools registered in total | **23** | 4 always-on reads + 17 gated imperative + 2 gated declarative |
 | Rule rows behind them | **19** | `src/ronr.data.js` — one factory, no per-tool code |
-| Tests | **213** | `npx vitest run` |
+| Tests | **306** | `npx vitest run` |
 | Legality cells asserted | **152** | 7 phases × 19 gated tools, plus a 19-cell sub-quorum sweep |
 | Quorum cliff removal | **8** | 7 by aborting the registration `AbortSignal`, 1 by dropping a `toolname` attribute |
 | `explain_path_to` search | **depth 6 · 399 nodes** | AND-OR over vote outcomes; completes in a few ms (the screen prints the exact figure) |
@@ -53,7 +53,7 @@ Measured against the live deploy in Chrome 151.0.7922.171. Not estimated.
 The real path — the same suite CI runs on every push:
 
 ```bash
-# 213 tests, no network, no keys
+# 306 tests, no network, no keys
 git clone https://github.com/edycutjong/mace.git && cd mace
 npm install
 npx vitest run

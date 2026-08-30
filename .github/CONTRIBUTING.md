@@ -10,7 +10,7 @@ bundler, no transpile, and no framework to learn first.
 git clone https://github.com/edycutjong/mace.git
 cd mace
 npm install          # vitest, and nothing else
-npm test             # 213 tests
+npm test             # 306 tests
 python3 -m http.server 8000   # then open http://localhost:8000
 ```
 

@@ -4,7 +4,7 @@
 
 ## Checklist
 
-- [ ] `npm test` passes (213 tests before this PR — say the new number if it moved)
+- [ ] `npm test` passes (306 tests before this PR — say the new number if it moved)
 - [ ] No new runtime dependency, and still no build step
 - [ ] Legality changes are rows in `src/ronr.data.js`, not branches in a tool
 - [ ] Tested in Chrome 149+ with the WebMCP surface actually registered
