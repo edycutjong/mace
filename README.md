@@ -16,7 +16,9 @@ where the registered WebMCP tool set <em>is</em> the motion stack.
 </p>
 
 <p align="center">
-  <a href="https://pointoforder.netlify.app"><b>Live&nbsp;→&nbsp;pointoforder.netlify.app</b></a>
+  <a href="https://pointoforder.netlify.app"><b>Live&nbsp;bench&nbsp;→&nbsp;pointoforder.netlify.app</b></a>
+  &nbsp;·&nbsp;
+  <a href="https://mace.edycu.dev"><b>What&nbsp;it&nbsp;is&nbsp;→&nbsp;mace.edycu.dev</b></a>
 </p>
 
 <p align="center">
