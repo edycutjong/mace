@@ -1,9 +1,9 @@
 {
   "name": "mace",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "private": true,
   "type": "module",
-  "description": "A clerk's bench for meetings run under Robert's Rules \u2014 the registered WebMCP tool set IS the motion stack.",
+  "description": "A clerk's bench for meetings run under Robert's Rules — the registered WebMCP tool set IS the motion stack.",
   "license": "MIT",
   "homepage": "https://pointoforder.netlify.app",
   "repository": {
