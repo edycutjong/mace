@@ -38,6 +38,21 @@
 
 ## 📸 See it in Action
 
+<p align="center">
+  <img src="docs/assets/readme-cliff.gif" width="100%"
+       alt="The quorum cliff. Members present goes from 7 to 4 against a quorum of 5, and the panel header changes from 17 tools in order to 9 — the ledger line flips from twelve green plus-chips to seven red minus-chips, and the Out of order column fills with rows each citing section 40. The phase never changes.">
+</p>
+
+<p align="center"><em>One integer. Seventeen tools become nine, and the phase never moves (§40).<br>Seven leave by aborting the <code>AbortSignal</code> they were registered with; one leaves by dropping a <code>toolname</code> attribute.</em></p>
+
+<p align="center">
+  <img src="docs/assets/readme-bench.png" width="100%"
+       alt="The full clerk's bench three motions deep. Left: the motion stack showing a main motion, an amendment, and an amendment to that amendment. Right: the panel titled What is in order now, with 15 tools in the In order column and 8 in Out of order, each carrying the rule that removed it.">
+</p>
+
+<p align="center"><em>The bench at “the tangle”. Everything on the right is rendered from <code>document.modelContext.getTools()</code> — the API's own return value.</em></p>
+
+
 1. Open **<https://pointoforder.netlify.app>** in Chrome 149+ with WebMCP enabled. The banner
    reads `WebMCP live · document.modelContext` when the API resolved.
 2. Click **The tangle**. The meeting is now three motions deep — a main motion, an amendment,
