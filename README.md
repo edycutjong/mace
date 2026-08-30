@@ -19,7 +19,8 @@
   [![For Judges](https://img.shields.io/badge/⚖️_For-Judges-C9A43A?style=for-the-badge)](https://mace.edycu.dev/judge.html)
   [![Landing Page](https://img.shields.io/badge/📖_Landing-Page-3ECF8E?style=for-the-badge)](https://mace.edycu.dev)
   [![Pitch Deck](https://img.shields.io/badge/📊_Pitch-Deck-f59e0b?style=for-the-badge)](https://mace.edycu.dev/deck.html)
-  [![The WebMCP Challenge](https://img.shields.io/badge/Devpost-The_WebMCP_Challenge-8b5cf6?style=for-the-badge)](https://webmcp.devpost.com/)
+  [![Devpost](https://img.shields.io/badge/Devpost-devpost.com/software/mace-003E54?style=for-the-badge&logo=devpost&logoColor=white)](https://devpost.com/software/mace)
+  [![The WebMCP Challenge](https://img.shields.io/badge/Built_for-The_WebMCP_Challenge-8b5cf6?style=for-the-badge)](https://webmcp.devpost.com/)
 
   <br/>
 
