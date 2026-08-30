@@ -3,7 +3,7 @@
   "version": "1.0.21",
   "private": true,
   "type": "module",
-  "description": "A clerk's bench for meetings run under Robert's Rules — the registered WebMCP tool set IS the motion stack.",
+  "description": "A clerk's bench for meetings run under Robert's Rules \u2014 the registered WebMCP tool set IS the motion stack.",
   "license": "MIT",
   "homepage": "https://pointoforder.netlify.app",
   "repository": {
@@ -15,7 +15,8 @@
     "test:watch": "vitest",
     "coverage": "vitest run --coverage",
     "lint": "eslint .",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "bench": "node bench.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",

@@ -208,11 +208,23 @@ python3 -m http.server 8000  # then open http://localhost:8000
 ## 🧪 Testing & CI
 
 ```bash
-npm test          # 213 unit tests against the reducer and the rulebook
-npm run test:watch
-npm run lint      # eslint 9, flat config — correctness rules, no formatter
-npm run e2e       # 7 Playwright specs driving the real page in Chromium
+npm test           # 306 unit tests, incl. all 152 legality cells
+npm run coverage   # 100% stmts/branches/funcs/lines on the seven pure modules
+npm run bench      # real run against the LIVE origin in Chrome — ~8s, no keys, no flags
 ```
+
+### Reproduce the numbers
+
+`npm run bench` drives `document.modelContext` on the deployed origin in real Chrome and
+**exits non-zero if any gate fails** — it is a verification script, not a print script.
+Latest run (2026-08-30, Chrome 151.0.7922.171, M1 Max):
+
+> **90 comparisons of `getTools()` against the number on screen. 0 divergences.**
+
+`getTools()` p50 0.20 ms / p95 0.30 ms · quorum cliff submit→settled p50 1.40 ms / p95 4.20 ms ·
+`explain_path_to` p50 1.10 ms / p95 1.40 ms, proving depth 6 over 399 nodes every run.
+Full table, methodology and limitations: **[DEMO.md](DEMO.md)**.
+
 
 The E2E suite serves the repo as static files — the same thing Netlify does — and
 asserts the panel counts the product's whole claim rests on: the widest frontier is
