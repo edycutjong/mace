@@ -52,6 +52,13 @@
 
 <p align="center"><em>The bench at “the tangle”. Everything on the right is rendered from <code>document.modelContext.getTools()</code> — the API's own return value.</em></p>
 
+<p align="center">
+  <img src="docs/assets/readme-chatgpt-agent.png" width="100%"
+       alt="The ChatGPT desktop app, Work tab. Left: the prompt Record attendance of 7 members, and the reply Attendance recorded, 7 members are present. Right: the in-app browser showing mace, with the header now reading PHASE pre meeting, PRESENT 7, quorum present. The banner above it reads WebMCP live, document.modelContext — tools registered, but this client's modelContext is not an EventTarget, so there are no toolchange events.">
+</p>
+
+<p align="center"><em>An agent, not us. ChatGPT executes <code>set_members_present</code> and the page crosses quorum —<br><strong>the state changed</strong>, so this cannot be a model reading the screen.<br>Note the banner: that client's <code>modelContext</code> is not an <code>EventTarget</code>, and mace says so rather than pretending.</em></p>
+
 
 1. Open **<https://pointoforder.netlify.app>** in Chrome 149+ with WebMCP enabled. The banner
    reads `WebMCP live · document.modelContext` when the API resolved.
