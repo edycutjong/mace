@@ -186,8 +186,8 @@ contradicts the injected claim instead of merely surviving it.
 
 ```bash
 git clone https://github.com/edycutjong/mace.git && cd mace
-npm install                 # test + lint tooling only — zero runtime dependencies
-python3 -m http.server 8000 # then open http://localhost:8000
+npm install                  # test + lint tooling only — zero runtime dependencies
+python3 -m http.server 8000  # then open http://localhost:8000
 ```
 
 ## 🧪 Testing & CI
