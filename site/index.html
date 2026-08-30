@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>mace — the tool list is the agenda</title>
-<meta name="description" content="A clerk's bench for a meeting under Robert's Rules, where the registered WebMCP tool set is the motion stack. An action that is out of order does not exist to be called.">
+<meta name="description" content="A clerk&#39;s bench for meetings under Robert&#39;s Rules: the registered WebMCP tool set IS the motion stack, so an out-of-order action does not exist to be called.">
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#0A0D13">
 <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
@@ -55,7 +55,7 @@ body{margin:0;background:var(--bg-base);color:var(--text-hi);
   font-family:var(--font-ui);font-size:17px;line-height:1.65;
   -webkit-font-smoothing:antialiased;overflow-x:hidden}
 img,svg{max-width:100%;display:block}
-h1,h2,h3,h4,p,ul,ol,figure,blockquote{margin:0}
+h1,h2,h3,p,ul,ol,figure,blockquote{margin:0}
 ul,ol{padding:0;list-style:none}
 a{color:inherit}
 button,input,select{font:inherit;color:inherit}
@@ -479,7 +479,7 @@ figcaption{font-size:.86rem;color:var(--text-low);padding:11px 14px;
 .card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:14px;
   padding:22px;transition:border-color var(--fast),transform var(--fast),background var(--fast)}
 .card:hover{border-color:var(--border-default);transform:translateY(-2px);background:var(--bg-raised)}
-.card h4{font-family:var(--font-display);font-size:1.06rem;font-weight:600;margin-bottom:9px}
+.card h3.card-h{font-family:var(--font-display);font-size:1.06rem;font-weight:600;margin-bottom:9px}
 .card h4 .k{font-family:var(--font-mono);font-size:.85rem;color:var(--primary);display:block;
   letter-spacing:.08em;margin-bottom:5px;text-transform:uppercase}
 .card p{font-size:.9rem;color:var(--text-mid);line-height:1.6}
@@ -867,20 +867,20 @@ html{scroll-behavior:smooth;scroll-padding-top:84px}
       <div class="beat-txt">
         <div class="cards" style="grid-template-columns:1fr;gap:14px">
           <div class="card">
-            <h4><span class="k">removal mechanism 1</span>Abort the registration signal</h4>
+            <h3 class="card-h"><span class="k">removal mechanism 1</span>Abort the registration signal</h3>
             <p>17 gated imperative tools, one <code>AbortController</code> each, composed with a bulk
               epoch signal via <code>AbortSignal.any()</code>. When <code>rule()</code> stops permitting
               an act, its controller aborts and the tool leaves <code>getTools()</code>.</p>
           </div>
           <div class="card">
-            <h4><span class="k">removal mechanism 2</span>Drop the <code>toolname</code> attribute</h4>
+            <h3 class="card-h"><span class="k">removal mechanism 2</span>Drop the <code>toolname</code> attribute</h3>
             <p>2 declarative form tools are owned by an attribute, not a controller.
               <code>removeAttribute('toolname')</code> takes the form out of the same tool list, on the
               same predicate, firing the same <code>toolchange</code>. The vote <em>is</em> the form —
               there is no imperative <code>record_vote</code> tool at all.</p>
           </div>
           <div class="card">
-            <h4><span class="k">the diff</span>Symmetric difference, not a rebuild</h4>
+            <h3 class="card-h"><span class="k">the diff</span>Symmetric difference, not a rebuild</h3>
             <p>A naive implementation aborts everything and re-registers 23 tools per transition. mace
               touches only what changed and prints the <code>+N −M</code> on screen — the ledger line
               you can see in every screenshot on this page.</p>
@@ -988,13 +988,13 @@ html{scroll-behavior:smooth;scroll-padding-top:84px}
     </div>
 
     <div class="cards rv" style="margin-top:clamp(40px,5vw,64px)">
-      <div class="card"><h4><span class="k">the rulebook</span>Data, with zero logic</h4>
+      <div class="card"><h3 class="card-h"><span class="k">the rulebook</span>Data, with zero logic</h3>
         <p><code>src/ronr.data.js</code> holds 12 motion types, 19 gated tools and the §40 set. Every
           legality verdict is a fold over it; application code is never allowed to invent a rule.</p></div>
-      <div class="card"><h4><span class="k">the deploy</span>What you read is what runs</h4>
+      <div class="card"><h3 class="card-h"><span class="k">the deploy</span>What you read is what runs</h3>
         <p>No framework, no bundler, no transpile. <code>netlify.toml</code> publishes the repository
           root, so the file you open in the repo is byte-identical to the file the browser executes.</p></div>
-      <div class="card"><h4><span class="k">the minute book</span>Corrections are appended</h4>
+      <div class="card"><h3 class="card-h"><span class="k">the minute book</span>Corrections are appended</h3>
         <p>Never applied over the entry they correct, so the record shows both what was first written
           and what it was corrected to — <span class="cite">§48</span>, and how real minutes work.</p></div>
     </div>
