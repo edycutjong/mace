@@ -74,9 +74,13 @@ Recorded because the honest absence is worth more than a tick.
 
 - **Zero external users.** No practitioner has run a meeting through this. Nothing in the
   submission claims adoption, and none of the numbers above are usage numbers.
-- **The ChatGPT in-app browser is unverified.** Confirmed working in Chrome 151 only. The
-  headers, the origin-trial token and a `<meta>` fallback are all in place for it, but
-  “should work” is not “tested”.
+- **The ChatGPT in-app browser fires no `toolchange`.** It is otherwise verified: on
+  2026-08-30 (GPT-5.6) tools registered, `getTools()` answered, and the agent executed
+  `set_members_present` through `executeTool` — the page went from `PRESENT 0 · QUORUM
+  ABSENT (§40)` to `PRESENT 7 · quorum present`. But that client's `modelContext` is not
+  an `EventTarget`, so `addEventListener('toolchange')` throws and the event never
+  arrives; the panel polls `getTools()` until the surface settles instead. Chrome 151
+  remains the only client where the event path itself is exercised.
 - **No benchmark suite.** The search figures are single live measurements against the deploy,
   described as such — not p50/p95 over repeated runs.
 - **Germaneness is never ruled on.** Not computable from a table, so the chair rules and the

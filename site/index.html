@@ -1018,9 +1018,12 @@ html{scroll-behavior:smooth;scroll-padding-top:84px}
       <div class="limit"><b>Zero external users.</b><p>Nobody outside the team has used it. No adoption,
         no testimonials, no waitlist. Outreach to board secretaries is open; sessions with real clerks
         are the honest next proof and are not claimed yet.</p></div>
-      <div class="limit"><b>Only Chrome 151 is confirmed.</b><p>The ChatGPT in-app browser is
-        <em>unverified</em>. The three required response headers and the origin-trial token are
-        confirmed good; that client is not.</p></div>
+      <div class="limit"><b>No <code>toolchange</code> in the ChatGPT browser.</b><p>Verified there
+        on 2026-08-30 — tools registered, <code>getTools()</code> answered, and the agent executed
+        <code>set_members_present</code> to carry the room across quorum. But its
+        <code>modelContext</code> is <em>not an <code>EventTarget</code></em>, so the event never
+        fires and the panel polls until the surface settles. Chrome 151 is still the only client
+        where the event path itself runs.</p></div>
       <div class="limit"><b>The meeting is seeded.</b><p>A fictional HOA board log — but not a dressed
         screen. Every checkpoint replays through the same <code>reduce()</code> the live bench uses, and
         the demo controls can be deleted without changing any of the moments on this page.</p></div>

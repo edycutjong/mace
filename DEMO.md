@@ -98,7 +98,11 @@ until the API itself reports the new surface.
 - **The search timing varies run to run** (0.5–13 ms observed across sessions). Depth 6 and 399
   nodes are stable and gated; the millisecond figure is not, which is why no single ms value
   appears on any judged surface.
-- **Not measured:** the ChatGPT in-app browser. Every number here is Chrome 151. That client is
-  unverified, and nothing in this file should be read as covering it.
+- **Not measured:** the ChatGPT in-app browser. Every number in this file is Chrome 151. That
+  client is *functionally* verified — on 2026-08-30 (GPT-5.6) tools registered, `getTools()`
+  answered, and the agent executed `set_members_present` through `executeTool`, taking the page
+  from `PRESENT 0 · QUORUM ABSENT (§40)` to `PRESENT 7 · quorum present` — but nothing was timed
+  there, and its `modelContext` is not an `EventTarget`, so the `toolchange` path is not
+  exercised in it at all. No number here should be read as covering that client.
 - **Not measured:** concurrent users, memory, or long-session behaviour. mace is a single-page
   static app with no server, so there is no throughput dimension to report.

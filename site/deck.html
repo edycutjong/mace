@@ -1287,7 +1287,7 @@ Clone it and run it. That is the whole claim — there is no build step between 
           <div class="wordmark" style="font-size:104px;color:var(--out-of-order);line-height:.9">0</div>
           <p class="body" style="font-size:20px"><strong>External users.</strong> Nobody outside the team has used this. There is no traction slide in this deck because there is no traction.</p>
         </div>
-        <div class="card-b" style="border-left:3px solid var(--out-of-order)"><p class="body" style="font-size:19px"><strong>The ChatGPT in-app browser is unverified.</strong> Chrome 151 is confirmed, and so are the headers and the origin-trial token. That client is not.</p></div>
+        <div class="card-b" style="border-left:3px solid var(--out-of-order)"><p class="body" style="font-size:19px"><strong>The ChatGPT in-app browser fires no <code>toolchange</code>.</strong> Verified there on 2026-08-30 — tools register, the agent executed <code>set_members_present</code> and carried the room across quorum. But its <code>modelContext</code> is not an <code>EventTarget</code>, so the panel polls instead of listening.</p></div>
         <div class="card-b" style="border-left:3px solid var(--out-of-order)"><p class="body" style="font-size:19px"><strong>The meeting is seeded fiction.</strong> A fictional HOA board log — a real replay through the same <code>reduce()</code>, but not a real board.</p></div>
         <div class="card-b" style="border-left:3px solid var(--out-of-order)"><p class="body" style="font-size:19px"><strong>Quorum is one number, from one association's Art. IV §3.</strong> Bylaws-as-data is a second data file, not a rewrite — but it is not written.</p></div>
       </div>
@@ -1295,7 +1295,7 @@ Clone it and run it. That is the whole claim — there is no build step between 
       <div class="stack" style="flex:.96;gap:0">
         <div class="vs-sub" style="margin-bottom:18px">The next honest proof</div>
         <div class="tick b"><span>→</span><p class="body" style="font-size:19px">Sessions with <strong>real board secretaries</strong> on the live URL. Outreach is open; we do not claim it yet.</p></div>
-        <div class="tick b"><span>→</span><p class="body" style="font-size:19px">Run it in the <strong>ChatGPT in-app browser</strong> and record the result either way.</p></div>
+        <div class="tick b"><span>→</span><p class="body" style="font-size:19px">Get <code>toolchange</code> where it is missing — either an <code>EventTarget</code> <code>modelContext</code> in the ChatGPT browser, or an upstream signal that polling is the sanctioned fallback.</p></div>
         <div class="tick b"><span>→</span><p class="body" style="font-size:19px"><strong>Per-member voting</strong> — the precondition for <em>Reconsider</em> <span class="rule-cite">§37</span>, where eligibility is restricted to a member who voted on the prevailing side. mace records tallies, so shipping it now would mean shipping a rule mace cannot check.</p></div>
         <div class="tick b"><span>→</span><p class="body" style="font-size:19px"><strong>Still no machine learning, on purpose.</strong> Germaneness is not computable from a table, so mace never rules on it.</p></div>
       </div>

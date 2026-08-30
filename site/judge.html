@@ -201,9 +201,14 @@ npx vitest run</pre>
   <ul class="lim">
     <li><b>Zero external users.</b> No practitioner has run a meeting through this. Nothing in
       the submission claims adoption, and none of the numbers above are usage numbers.</li>
-    <li><b>The ChatGPT in-app browser is unverified.</b> Confirmed working in Chrome 151 only.
-      The headers, the origin-trial token and a <code>&lt;meta&gt;</code> fallback are all in
-      place for it, but “should work” is not “tested”.</li>
+    <li><b>The ChatGPT in-app browser fires no <code>toolchange</code>.</b> It is otherwise
+      verified: on 2026-08-30 (GPT-5.6) tools registered, <code>getTools()</code> answered, and
+      the agent executed <code>set_members_present</code> through <code>executeTool</code> — the
+      page went from <code>PRESENT 0 · QUORUM ABSENT (§40)</code> to <code>PRESENT 7 · quorum
+      present</code>. But that client's <code>modelContext</code> is not an
+      <code>EventTarget</code>, so the event never arrives and the panel polls
+      <code>getTools()</code> until the surface settles instead. Chrome 151 remains the only
+      client where the event path itself is exercised.</li>
     <li><b>No benchmark suite.</b> The search figures are single live measurements against the
       deploy, described as such — not p50/p95 over repeated runs.</li>
     <li><b>Germaneness is never ruled on.</b> It is not computable from a table, so the chair
