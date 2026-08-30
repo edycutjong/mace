@@ -1,0 +1,62 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="mace — the tool list is the agenda; a brass mace whose head is a stack of motion frames standing on the table, beside one struck-out tool that does not exist">
+  <!-- mace mark, rev 2. The head is the motion stack (three frames, newest on top,
+       the top frame wears the crown = immediately pending); the shaft grounds it on
+       the table bar — no mace on the table, no valid business; no tool in the set,
+       no valid action. The struck ring beside the head is the standing absence:
+       a tool that is out of order does not exist to be called (thesis Q5 — the mark
+       carries the state change, not just the object). rev 2 geometry: 20px band
+       gaps and a 42px table so the stack still articulates at 32px and the table
+       survives 16px. rev 3 (2026-08-26 round-3 pass): the struck ring opened up —
+       r 30→40, stroke 13→15, bar 14→18 (hole diameter 47→65) — so the negation
+       reads as a struck RING, not a red dot, at 24–32px; measured side-by-side
+       before shipping. Geometry reused by icon-animated.svg. -->
+  <defs>
+    <linearGradient id="plate" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#10141D"/>
+      <stop offset="100%" stop-color="#0A0D13"/>
+    </linearGradient>
+    <linearGradient id="brassHi" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="var(--brass-300, #E6C868)"/>
+      <stop offset="100%" stop-color="var(--primary, #C9A43A)"/>
+    </linearGradient>
+    <linearGradient id="brassLo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="var(--primary, #C9A43A)"/>
+      <stop offset="100%" stop-color="#A8862E"/>
+    </linearGradient>
+    <filter id="glow" x="46" y="20" width="420" height="472" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="14"/>
+    </filter>
+  </defs>
+
+  <!-- self-plate: survives GitHub light AND dark -->
+  <rect x="16" y="16" width="480" height="480" rx="104" fill="url(#plate)"/>
+  <rect x="17" y="17" width="478" height="478" rx="103" stroke="#2E3A54" stroke-width="2" fill="none"/>
+
+  <!-- soft brass aura behind the mark -->
+  <g filter="url(#glow)" opacity="0.32">
+    <rect x="150" y="60" width="212" height="236" rx="10" fill="var(--primary, #C9A43A)"/>
+    <rect x="86" y="404" width="340" height="42" rx="21" fill="var(--primary, #C9A43A)"/>
+  </g>
+
+  <!-- the mace -->
+  <g>
+    <!-- crown (rides the top frame) -->
+    <rect x="150" y="60" width="44" height="36" rx="8" fill="url(#brassHi)"/>
+    <rect x="234" y="60" width="44" height="36" rx="8" fill="url(#brassHi)"/>
+    <rect x="318" y="60" width="44" height="36" rx="8" fill="url(#brassHi)"/>
+    <!-- head: the motion stack, newest on top -->
+    <rect x="150" y="106" width="212" height="50" rx="10" fill="url(#brassHi)"/>
+    <rect x="150" y="176" width="212" height="50" rx="10" fill="url(#brassLo)"/>
+    <rect x="150" y="246" width="212" height="50" rx="10" fill="url(#brassLo)"/>
+    <!-- shaft -->
+    <rect x="238" y="288" width="36" height="126" rx="16" fill="url(#brassLo)"/>
+    <!-- the table -->
+    <rect x="86" y="404" width="340" height="42" rx="21" fill="url(#brassHi)"/>
+  </g>
+
+  <!-- the standing absence: one tool, struck out — it does not exist to be called -->
+  <g>
+    <circle cx="416" cy="116" r="40" stroke="#F2635B" stroke-width="15" fill="none"/>
+    <rect x="362" y="107" width="108" height="18" rx="9" fill="#F2635B"/>
+  </g>
+</svg>

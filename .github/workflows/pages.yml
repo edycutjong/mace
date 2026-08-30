@@ -1,0 +1,58 @@
+# Publishes site/ — the landing page and the pitch deck — to https://mace.edycu.dev
+#
+# It publishes site/, NOT the repository root, and that distinction is load-bearing.
+# The root is the product, and the WebMCP origin-trial token is bound to
+# https://pointoforder.netlify.app:443. Serving the app from any other host makes
+# document.modelContext resolve to nothing, so the bench would render its degraded
+# "WebMCP not detected" state on this domain. The live bench therefore stays on Netlify;
+# this domain carries the pitch and links to it.
+name: Pages
+
+on:
+  push:
+    branches: [main]
+    paths: ['site/**', '.github/workflows/pages.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never let two Pages deploys race; let an in-flight one finish rather than cancelling
+# it half-published.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # Fail loudly rather than shipping a half-broken domain. The CNAME is what binds
+      # the custom domain, and an index that lost its assets is worse than no deploy.
+      - name: Check the artifact is intact
+        run: |
+          test -f site/index.html    || { echo "site/index.html missing"; exit 1; }
+          test -f site/deck.html     || { echo "site/deck.html missing"; exit 1; }
+          test -f site/CNAME         || { echo "site/CNAME missing — the custom domain would drop"; exit 1; }
+          grep -qx 'mace.edycu.dev' site/CNAME || { echo "CNAME is not mace.edycu.dev"; exit 1; }
+          test -d site/assets        || { echo "site/assets missing"; exit 1; }
+          echo "ok — $(find site -type f | wc -l | tr -d ' ') files"
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
