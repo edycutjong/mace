@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mace — for the judge</title>
+<meta name="description" content="One claim, a 30-second path, the real numbers, the reproduce command, and what mace has not proved. Built for one reader.">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0A0D13">
+<meta name="robots" content="index,follow">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="canonical" href="https://mace.edycu.dev/judge.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="mace">
+<meta property="og:url" content="https://mace.edycu.dev/judge.html">
+<meta property="og:title" content="mace — for the judge">
+<meta property="og:description" content="One claim, a 30-second path, the real numbers, the reproduce command, and what mace has not proved.">
+<meta property="og:image" content="https://mace.edycu.dev/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="mace — for the judge">
+<meta name="twitter:description" content="One claim, a 30-second path, the real numbers, and the honest limitations.">
+<meta name="twitter:image" content="https://mace.edycu.dev/assets/og-image.png">
+<style>
+:root{
+  --primary:#C9A43A; --brass-300:#E6C868; --in-order:#3ECF8E; --out-of-order:#F2635B;
+  --bg-base:#0A0D13; --bg-region:#10141D; --bg-card:#171D2A; --bg-raised:#202839;
+  --text-hi:#EDF1F8; --text-mid:#A9B3C6; --text-low:#8B97AE;
+  --bd:rgba(255,255,255,.10); --bd-soft:rgba(255,255,255,.06);
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --disp:Fraunces,Georgia,"Times New Roman",serif;
+  --fast:.16s ease;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg-base);color:var(--text-hi);font-family:var(--sans);
+  font-size:16px;line-height:1.62;-webkit-font-smoothing:antialiased}
+.wrap{max-width:860px;margin:0 auto;padding:0 24px}
+a{color:var(--brass-300)}
+a:hover{color:var(--primary)}
+:focus-visible{outline:2px solid var(--primary);outline-offset:3px;border-radius:4px}
+.skip{position:absolute;left:-9999px}
+.skip:focus{left:24px;top:14px;position:fixed;z-index:9;background:var(--bg-raised);
+  color:var(--text-hi);padding:10px 16px;border-radius:8px;text-decoration:none}
+
+header{border-bottom:1px solid var(--bd-soft);background:rgba(10,13,19,.9);
+  backdrop-filter:blur(8px);position:sticky;top:0;z-index:5}
+.hd{display:flex;align-items:center;gap:12px;padding:14px 0}
+.hd img{width:26px;height:26px}
+.hd b{font-family:var(--disp);font-size:1.2rem}
+.hd .back{margin-left:auto;font-size:.9rem;color:var(--text-mid);text-decoration:none;
+  padding:7px 12px;border-radius:8px;transition:background var(--fast),color var(--fast)}
+.hd .back:hover{background:rgba(255,255,255,.06);color:var(--text-hi)}
+
+h1{font-family:var(--disp);font-size:clamp(2rem,1.4rem + 2.4vw,3rem);line-height:1.1;
+  margin:44px 0 6px;font-weight:600}
+.eyebrow{font-family:var(--mono);font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--primary);margin:40px 0 0}
+h2{font-family:var(--disp);font-size:1.5rem;font-weight:600;margin:52px 0 4px;
+  padding-top:26px;border-top:1px solid var(--bd-soft)}
+h2 .n{font-family:var(--mono);font-size:.85rem;color:var(--primary);
+  display:block;letter-spacing:.1em;margin-bottom:6px;border:0;padding:0}
+p{margin:14px 0}
+.claim{font-family:var(--disp);font-size:clamp(1.25rem,1.1rem + .8vw,1.6rem);line-height:1.42;
+  color:var(--text-hi);border-left:3px solid var(--primary);padding:4px 0 4px 20px;margin:22px 0}
+.sub{color:var(--text-mid)}
+code{font-family:var(--mono);font-size:max(12.5px,.9em);
+  background:rgba(255,255,255,.055);padding:.12em .4em;border-radius:5px;color:var(--brass-300);
+  overflow-wrap:anywhere}
+ol.path{counter-reset:s;list-style:none;padding:0;margin:20px 0}
+ol.path li{counter-increment:s;position:relative;padding:0 0 0 46px;margin:0 0 18px}
+ol.path li::before{content:counter(s);position:absolute;left:0;top:1px;width:30px;height:30px;
+  border-radius:50%;background:var(--bg-raised);border:1px solid var(--bd);
+  font-family:var(--mono);font-size:.85rem;display:grid;place-items:center;color:var(--primary)}
+.k{font-family:var(--mono);color:var(--in-order);font-weight:600}
+table{width:100%;border-collapse:collapse;margin:18px 0;font-size:.94rem}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--bd-soft);vertical-align:top}
+th{font-family:var(--mono);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--text-low);font-weight:600}
+td.v{font-family:var(--mono);color:var(--in-order);white-space:nowrap}
+pre{background:var(--bg-region);border:1px solid var(--bd-soft);border-radius:10px;
+  padding:16px 18px;overflow-x:auto;font-family:var(--mono);font-size:.88rem;line-height:1.66;
+  color:var(--text-hi);margin:16px 0}
+pre .c{color:var(--text-low)}
+.warn{border-left:3px solid var(--out-of-order);background:rgba(242,99,91,.06);
+  padding:14px 18px;border-radius:0 10px 10px 0;margin:18px 0}
+.warn b{color:var(--out-of-order)}
+ul.lim{list-style:none;padding:0;margin:18px 0}
+ul.lim li{padding:12px 0 12px 30px;border-bottom:1px solid var(--bd-soft);position:relative}
+ul.lim li::before{content:"—";position:absolute;left:2px;color:var(--out-of-order);
+  font-family:var(--mono)}
+ul.lim li b{color:var(--text-hi)}
+.links{display:grid;grid-template-columns:repeat(auto-fit,minmax(228px,1fr));gap:12px;margin:22px 0 8px}
+.links a{display:block;padding:15px 17px;background:var(--bg-card);border:1px solid var(--bd);
+  border-radius:11px;text-decoration:none;color:var(--text-hi);
+  transition:background var(--fast),border-color var(--fast),transform var(--fast)}
+.links a:hover{background:var(--bg-raised);border-color:var(--primary);transform:translateY(-1px)}
+.links a:active{transform:translateY(0)}
+.links .lb{display:block;font-family:var(--mono);font-size:.76rem;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--primary);margin-bottom:4px}
+.links .lu{font-size:.9rem;color:var(--text-mid);overflow-wrap:anywhere}
+footer{margin:60px 0 40px;padding-top:22px;border-top:1px solid var(--bd-soft);
+  color:var(--text-low);font-size:.9rem}
+/* The receipts table has three columns and nowrap values; below ~640px it was wider
+   than the viewport and pushed the whole page sideways. Let it scroll in its own box
+   instead of the body scrolling — a judge on a phone should never have to pan the page. */
+@media (max-width:640px){
+  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  td.v{white-space:normal}
+  ol.path li{padding-left:38px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header>
+  <div class="wrap hd">
+    <img src="assets/icon.svg" alt="" width="26" height="26">
+    <b>mace</b>
+    <a class="back" href="./">← overview</a>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+
+  <p class="eyebrow">For the judge · The WebMCP Challenge</p>
+  <h1>Everything, on one page.</h1>
+  <p class="sub">No signup, no keys, no clone. Every number below is one you can check in the
+  next few minutes, and the last section is what this project has <em>not</em> proved.</p>
+
+  <h2><span class="n">01</span>The claim</h2>
+  <p class="claim">mace is a clerk's bench for a meeting under Robert's Rules where the
+  registered WebMCP tool set <em>is</em> the motion stack — an action that is out of order
+  does not exist to be called.</p>
+  <p>Most agent apps hand over every tool and reject illegal calls at runtime. mace removes
+  the tool instead. The panel <b>“What is in order now”</b> renders its left column directly
+  from <code>document.modelContext.getTools()</code> — the API's own return value — so the
+  screen and the API cannot disagree.</p>
+
+  <h2><span class="n">02</span>The 30-second path</h2>
+  <div class="warn">
+    <p style="margin:0"><b>Use Chrome 149+ with WebMCP enabled.</b> The banner top-right must
+    read <code>WebMCP live · document.modelContext</code>. If it says “not detected”, the panel
+    falls back to the internal state machine and says so — the product never pretends the API
+    is there when it is not.</p>
+  </div>
+  <ol class="path">
+    <li>Open <a href="https://pointoforder.netlify.app" rel="noopener"><b>pointoforder.netlify.app</b></a>.
+      The count next to <b>In order</b> reads <span class="k">5</span>.</li>
+    <li>Click <b>Widest frontier</b> → <span class="k">17</span>. Click <b>The tangle</b> →
+      <span class="k">15</span>.</li>
+    <li>At the tangle, look for <code>move_to_amend_the_amendment</code>. It is not greyed out
+      and not refused — it is <b>absent</b>, and the right column prints the rule that removed
+      it: <b>§12</b>, a first-degree amendment must be the immediately pending question.</li>
+    <li>Type <b>4</b> into <b>Members in the room</b> and press <b>Record attendance</b>.
+      Quorum is 5, so <span class="k">17 → 9</span> on one integer. The phase never moves;
+      the whole agenda does (<b>§40</b>).</li>
+    <li>Open the console and check the panel is not lying:<br>
+      <code>(await document.modelContext.getTools()).length</code> — it equals the badge, at
+      every checkpoint.</li>
+  </ol>
+
+  <h2><span class="n">03</span>The receipts</h2>
+  <p class="sub">Measured against the live deploy in Chrome 151.0.7922.171, not estimated.</p>
+  <table>
+    <thead><tr><th>What</th><th>Value</th><th>Where it comes from</th></tr></thead>
+    <tbody>
+      <tr><td><code>getTools()</code> at the four checkpoints</td><td class="v">5 / 17 / 15 / 9</td><td>identical to the on-screen count; zero divergence</td></tr>
+      <tr><td>Tools registered in total</td><td class="v">23</td><td>4 always-on reads + 17 gated imperative + 2 gated declarative</td></tr>
+      <tr><td>Rule rows behind them</td><td class="v">19</td><td><code>src/ronr.data.js</code> — one factory, no per-tool code</td></tr>
+      <tr><td>Tests</td><td class="v">213</td><td><code>npx vitest run</code></td></tr>
+      <tr><td>Legality cells asserted</td><td class="v">152</td><td>7 phases × 19 gated tools, plus a 19-cell sub-quorum sweep</td></tr>
+      <tr><td>Quorum cliff removal</td><td class="v">8</td><td>7 by aborting the registration <code>AbortSignal</code>, 1 by dropping a <code>toolname</code> attribute</td></tr>
+      <tr><td><code>explain_path_to</code> search</td><td class="v">depth 6 · 399 nodes</td><td>AND-OR over vote outcomes; completes in a few ms (the screen prints the exact figure)</td></tr>
+      <tr><td>Runtime dependencies</td><td class="v">0</td><td>no framework, no bundler, no transpile</td></tr>
+    </tbody>
+  </table>
+
+  <h2><span class="n">04</span>Reproduce it</h2>
+  <p>The real path — the same suite CI runs on every push:</p>
+<pre><span class="c"># 213 tests, no network, no keys</span>
+git clone https://github.com/edycutjong/mace.git &amp;&amp; cd mace
+npm install
+npx vitest run</pre>
+  <p>To run the bench locally, serve it statically — there is no build step:</p>
+<pre>python3 -m http.server 8000   <span class="c"># then open http://localhost:8000</span></pre>
+  <p class="sub">A local copy needs Chrome's WebMCP flag rather than the origin-trial token:
+  the token is bound to <code>pointoforder.netlify.app</code> and will not activate on
+  <code>localhost</code>.</p>
+
+  <h2><span class="n">05</span>What this has not proved</h2>
+  <p class="sub">Recorded because the honest absence is worth more than a tick.</p>
+  <ul class="lim">
+    <li><b>Zero external users.</b> No practitioner has run a meeting through this. Nothing in
+      the submission claims adoption, and none of the numbers above are usage numbers.</li>
+    <li><b>The ChatGPT in-app browser is unverified.</b> Confirmed working in Chrome 151 only.
+      The headers, the origin-trial token and a <code>&lt;meta&gt;</code> fallback are all in
+      place for it, but “should work” is not “tested”.</li>
+    <li><b>No benchmark suite.</b> The search figures are single live measurements against the
+      deploy, described as such — not p50/p95 over repeated runs.</li>
+    <li><b>Germaneness is never ruled on.</b> It is not computable from a table, so the chair
+      rules and the ruling enters the minutes. That limit is the design, not a gap — and it
+      means mace cannot claim to enforce all of Robert's Rules.</li>
+    <li><b>The meeting is seeded.</b> A fictional HOA board log. It is not a dressed screen —
+      every checkpoint replays through the same <code>reduce()</code> the live bench uses, and
+      you can drive it forward yourself from any of them.</li>
+  </ul>
+
+  <h2><span class="n">06</span>Links</h2>
+  <div class="links">
+    <a href="https://pointoforder.netlify.app" rel="noopener"><span class="lb">Live bench</span><span class="lu">pointoforder.netlify.app</span></a>
+    <a href="https://github.com/edycutjong/mace" rel="noopener"><span class="lb">Source · MIT</span><span class="lu">github.com/edycutjong/mace</span></a>
+    <a href="./"><span class="lb">Overview</span><span class="lu">mace.edycu.dev</span></a>
+    <a href="deck.html"><span class="lb">Pitch deck</span><span class="lu">mace.edycu.dev/deck.html</span></a>
+  </div>
+
+  <footer>
+    Built for The WebMCP Challenge. MIT licensed. Judging has not taken place and no
+    placement is claimed. Every verdict in the product traces to a cited row in
+    <code>src/ronr.data.js</code>.
+  </footer>
+
+</main>
+</body>
+</html>

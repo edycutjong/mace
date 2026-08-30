@@ -45,6 +45,8 @@ jobs:
         run: |
           test -f site/index.html    || { echo "site/index.html missing"; exit 1; }
           test -f site/deck.html     || { echo "site/deck.html missing"; exit 1; }
+          test -f site/judge.html    || { echo "site/judge.html missing"; exit 1; }
+          test -f site/404.html      || { echo "site/404.html missing"; exit 1; }
           test -f site/CNAME         || { echo "site/CNAME missing — the custom domain would drop"; exit 1; }
           grep -qx 'mace.edycu.dev' site/CNAME || { echo "CNAME is not mace.edycu.dev"; exit 1; }
           test -d site/assets        || { echo "site/assets missing"; exit 1; }

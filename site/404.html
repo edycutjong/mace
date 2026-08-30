@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Not in order — mace</title>
+<meta name="description" content="That page is not in order. Every page on this site, listed.">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0A0D13">
+<meta name="robots" content="noindex,follow">
+<link rel="icon" href="/assets/icon.svg" type="image/svg+xml">
+<style>
+:root{
+  --primary:#C9A43A; --brass-300:#E6C868; --in-order:#3ECF8E; --out-of-order:#F2635B;
+  --bg-base:#0A0D13; --bg-card:#171D2A; --bg-raised:#202839;
+  --text-hi:#EDF1F8; --text-mid:#A9B3C6; --text-low:#8B97AE;
+  --bd:rgba(255,255,255,.10); --bd-soft:rgba(255,255,255,.06);
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --disp:Fraunces,Georgia,"Times New Roman",serif;
+  --fast:.16s ease;
+}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--bg-base);color:var(--text-hi);
+  font-family:var(--sans);line-height:1.6;display:grid;place-items:center;padding:40px 22px;
+  -webkit-font-smoothing:antialiased}
+.wrap{width:100%;max-width:680px}
+:focus-visible{outline:2px solid var(--primary);outline-offset:3px;border-radius:6px}
+.mark{width:52px;height:52px;margin-bottom:22px}
+.code{font-family:var(--mono);font-size:.82rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--out-of-order);margin:0 0 8px}
+h1{font-family:var(--disp);font-size:clamp(2rem,1.5rem + 2.2vw,2.9rem);line-height:1.12;
+  margin:0 0 12px;font-weight:600}
+.sub{color:var(--text-mid);margin:0 0 6px;font-size:1.02rem}
+.joke{color:var(--text-low);font-size:.94rem;margin:0 0 34px}
+.joke code{font-family:var(--mono);color:var(--brass-300);font-size:.9em}
+h2{font-family:var(--mono);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--text-low);margin:0 0 12px;font-weight:600}
+.links{display:grid;gap:10px;margin:0 0 30px}
+a.card{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;
+  padding:14px 17px;background:var(--bg-card);border:1px solid var(--bd);border-radius:11px;
+  text-decoration:none;color:var(--text-hi);
+  transition:background var(--fast),border-color var(--fast),transform var(--fast)}
+a.card:hover{background:var(--bg-raised);border-color:var(--primary);transform:translateY(-1px)}
+a.card:active{transform:translateY(0)}
+a.card b{font-weight:600}
+a.card .u{font-family:var(--mono);font-size:.83rem;color:var(--text-low);margin-left:auto;
+  overflow-wrap:anywhere}
+a.card .d{flex-basis:100%;font-size:.9rem;color:var(--text-mid)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--in-order);flex:none;
+  align-self:center}
+footer{color:var(--text-low);font-size:.88rem;border-top:1px solid var(--bd-soft);padding-top:18px}
+footer a{color:var(--brass-300)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <img class="mark" src="/assets/icon.svg" alt="" width="52" height="52">
+
+  <p class="code">404 · not in order</p>
+  <h1>That page does not exist to be called.</h1>
+  <p class="sub">Which is, admittedly, the entire thesis of this project.</p>
+  <p class="joke">The difference is that here it is an accident. In
+    <code>mace</code> it is the design — an out-of-order motion is absent from
+    <code>getTools()</code> rather than refused at runtime.</p>
+
+  <h2>Everything that is in order</h2>
+  <div class="links">
+    <a class="card" href="/">
+      <span class="dot"></span><b>Overview</b>
+      <span class="u">mace.edycu.dev</span>
+      <span class="d">What mace is, and the quorum cliff you can drive yourself.</span>
+    </a>
+    <a class="card" href="/judge.html">
+      <span class="dot"></span><b>For the judge</b>
+      <span class="u">/judge.html</span>
+      <span class="d">The claim, a 30-second path, the receipts, and what is not proved.</span>
+    </a>
+    <a class="card" href="/deck.html">
+      <span class="dot"></span><b>Pitch deck</b>
+      <span class="u">/deck.html</span>
+      <span class="d">14 slides. Arrow keys to move, <code>P</code> for presenter mode.</span>
+    </a>
+    <a class="card" href="https://pointoforder.netlify.app" rel="noopener">
+      <span class="dot"></span><b>The live bench</b>
+      <span class="u">pointoforder.netlify.app</span>
+      <span class="d">The product. WebMCP is live there and only there — the origin-trial
+        token is bound to that origin.</span>
+    </a>
+    <a class="card" href="https://github.com/edycutjong/mace" rel="noopener">
+      <span class="dot"></span><b>Source</b>
+      <span class="u">github.com/edycutjong/mace</span>
+      <span class="d">MIT. 213 tests. Start at <code>src/webmcp.js</code>.</span>
+    </a>
+  </div>
+
+  <footer>
+    Built for <a href="https://webmcp.devpost.com/" rel="noopener">The WebMCP Challenge</a>.
+  </footer>
+</main>
+</body>
+</html>

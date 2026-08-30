@@ -16,7 +16,8 @@
   <br/>
 
   [![Live Bench](https://img.shields.io/badge/🚀_Live-Bench-06b6d4?style=for-the-badge)](https://pointoforder.netlify.app)
-  [![What it is](https://img.shields.io/badge/📖_What_it-Is-3ECF8E?style=for-the-badge)](https://mace.edycu.dev)
+  [![For Judges](https://img.shields.io/badge/⚖️_For-Judges-C9A43A?style=for-the-badge)](https://mace.edycu.dev/judge.html)
+  [![Landing Page](https://img.shields.io/badge/📖_Landing-Page-3ECF8E?style=for-the-badge)](https://mace.edycu.dev)
   [![Pitch Deck](https://img.shields.io/badge/📊_Pitch-Deck-f59e0b?style=for-the-badge)](https://mace.edycu.dev/deck.html)
   [![The WebMCP Challenge](https://img.shields.io/badge/Devpost-The_WebMCP_Challenge-8b5cf6?style=for-the-badge)](https://webmcp.devpost.com/)
 
