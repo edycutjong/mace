@@ -87,7 +87,7 @@ business. No mace, no valid business. Here: **no tool, not in order.**
 
 <p align="center">
   <img src="docs/assets/architecture.png" width="100%"
-       alt="mace architecture: an append-only event log reduces to state; one rule() predicate produces the legal set; a symmetric diff against what is registered forks into two removal mechanisms — registerTool with an AbortSignal for the 17 imperative tools, and removing a toolname attribute for the 2 declarative ones — and both converge on a single toolchange event that drives the panel's two columns.">
+       alt="mace architecture, top to bottom. 01 the event log (append-only; every button and every call is one event) reduces to 02 state (phase, motion stack, quorum, the table), which rule() turns into 03 the legal set (phase grid intersected with the section 40 quorum overlay and stack-shape guards, 19 rows). 04 a symmetric diff against what is currently registered forks into exactly two removal mechanisms: mechanism one, registerTool with a signal, removed by controller.abort() because the spec has no unregisterTool() — 17 imperative tools; and mechanism two, a form carrying a toolname attribute, removed by removeAttribute('toolname') — 2 declarative tools. Both converge on 05 toolchange, one coalesced event, which drives three surfaces: getTools() renders the In order column from the API's own return value, rule() renders the Out of order column with the rule that removed each act, and the panel IS the listener rather than a subscriber keeping a copy.">
 </p>
 
 | Layer | Choice | Why |
