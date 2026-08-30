@@ -995,7 +995,10 @@ html{scroll-behavior:smooth;scroll-padding-top:84px}
           legality verdict is a fold over it; application code is never allowed to invent a rule.</p></div>
       <div class="card"><h3 class="card-h"><span class="k">the deploy</span>What you read is what runs</h3>
         <p>No framework, no bundler, no transpile. <code>netlify.toml</code> publishes the repository
-          root, so the file you open in the repo is byte-identical to the file the browser executes.</p></div>
+          root, so every source file you open in the repo is byte-identical to the file the browser
+          executes — hash <code>src/*.js</code> and <code>app.css</code> against the live origin and
+          they match. Only <code>index.html</code> differs, by the hosting meta tags Netlify injects
+          after our markup.</p></div>
       <div class="card"><h3 class="card-h"><span class="k">the minute book</span>Corrections are appended</h3>
         <p>Never applied over the entry they correct, so the record shows both what was first written
           and what it was corrected to — <span class="cite">§48</span>, and how real minutes work.</p></div>

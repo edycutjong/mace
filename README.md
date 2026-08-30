@@ -116,14 +116,24 @@ business. No mace, no valid business. Here: **no tool, not in order.**
 | Layer | Choice | Why |
 |---|---|---|
 | Agent surface | **WebMCP** — `document.modelContext` | The tool registry is the product's state surface, not an add-on |
-| Runtime | **Vanilla ES modules**, no framework | The file in this repo is byte-identical to the file the browser executes |
+| Runtime | **Vanilla ES modules**, no framework | Every source file in this repo is byte-identical to the file the browser executes |
 | Build | **None** | No bundler, no transpile — nothing between the source and the judge |
 | Rules | `ronr.data.js` — RONR 12th ed. as data, zero logic | Adding a motion type is adding a table row, not writing a tool |
 | Tests | **Vitest**, 306 tests | The legality grid is pure data, so it is exhaustively testable |
 | Host | **Netlify** + Chrome origin trial | Headers and token bound to one frozen origin |
 
-No framework, no bundler, no transpile: **the file you open in this repo is byte-identical to
-the file the browser executes.**
+No framework, no bundler, no transpile: **every source file you open in this repo is
+byte-identical to the file the browser executes.** Verify it yourself —
+
+```bash
+curl -s https://pointoforder.netlify.app/src/webmcp.js | shasum -a 256
+shasum -a 256 src/webmcp.js
+```
+
+…matches for `src/*.js` and `app.css`. The one exception is `index.html`, where Netlify
+injects ~720 bytes of its own hosting meta tags and a HUD script after our markup. Those are
+the host's, not ours, and none of our bytes change — but "byte-identical" should mean what it
+says, so the caveat is stated rather than left for you to find.
 
 ## 🏆 WebMCP Integration
 
