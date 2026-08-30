@@ -91,6 +91,38 @@ async function renderInOrder() {
 
   $('in-order').replaceChildren(host);   // one atomic swap, after the API answered
   $('in-order-count').textContent = String(names.length);
+  settleWithoutEvents(names.length);
+}
+
+/**
+ * THE PANEL MUST NOT LIE, INCLUDING IN A CLIENT WITH NO toolchange.
+ *
+ * Declarative tools are adopted by the browser from the DOM — it reads the `toolname`
+ * attribute off the <form> — not by a call we can await. Where toolchange fires that is
+ * invisible: the event announces the moment the surface settles, and the panel redraws.
+ * Without the event, the render that follows a state change can read getTools() a tick
+ * before the browser has picked the form up, and the count sticks one low. Measured in
+ * the ChatGPT-shaped client at the widest frontier: panel 16, getTools() 17, still wrong
+ * four seconds later. That is precisely the divergence this product claims is impossible,
+ * so it cannot be left in a client we know about.
+ *
+ * With no event to wait for, we poll until the surface stops moving. Bounded to ~600ms
+ * and entered only when toolchange is unavailable — a client that fires it never gets here.
+ */
+let toolEventsLive = false;
+let settleTimer = null;
+function settleWithoutEvents(rendered) {
+  if (toolEventsLive || !hasWebMCP || reg.degraded) return;
+  clearTimeout(settleTimer);
+  let tries = 0;
+  const tick = async () => {
+    if (toolEventsLive || ++tries > 12) return;
+    let n;
+    try { n = (await modelContext.getTools()).length; } catch { return; }
+    if (n !== rendered) { renderInOrder(); return; }   // that render re-arms the poll
+    settleTimer = setTimeout(tick, 50);
+  };
+  settleTimer = setTimeout(tick, 50);
 }
 
 // ── right column: rule(), with the citation that blocks each act ────────────
@@ -286,11 +318,34 @@ export async function boot() {
 
   // THE PANEL IS THE TOOLCHANGE LISTENER. Not a listener the panel happens to
   // have — the event is what drives the product's main surface.
+  //
+  // But subscribing is a SEPARATE capability from registering, and hasWebMCP only
+  // proves `registerTool` exists. ChatGPT's in-app browser (observed 2026-08-30 on
+  // GPT-5.6) hands back a modelContext that registers tools and answers getTools(),
+  // yet is not an EventTarget — addEventListener is undefined, so this line threw a
+  // TypeError *after* the UI had already painted. The page looked alive and then
+  // announced it had failed to start, which is the most misleading outcome available.
+  //
+  // Degrading here costs the proof, not the product: onChange() above already
+  // re-renders on every commit, because the state machine is the source of truth and
+  // the tool surface is derived from it. toolchange is how we demonstrate the surface
+  // is live; without it the panel still reads its counts from getTools().
   const regErr = startFailed ?? info?.registrationError ?? null;
   if (hasWebMCP && !regErr) {
-    modelContext.addEventListener('toolchange', () => { renderAll(); });
+    try {
+      modelContext.addEventListener('toolchange', () => { renderAll(); });
+      toolEventsLive = true;
+    } catch (err) {
+      console.error('[mace] modelContext is not an EventTarget; the panel will re-render from state instead:', err);
+    }
+  }
+
+  if (hasWebMCP && !regErr && toolEventsLive) {
     $('mcp-state').textContent = `WebMCP live · ${info.contextSource}`;
     $('mcp-state').classList.add('ok');
+  } else if (hasWebMCP && !regErr) {
+    $('mcp-state').textContent = `WebMCP live · ${info.contextSource} — tools registered, but this client's modelContext is not an EventTarget, so there are no toolchange events. The panel still reads its counts from getTools(); it re-renders on state changes instead of on the event.`;
+    $('mcp-state').classList.add('degraded');
   } else if (regErr) {
     $('mcp-state').textContent = `WebMCP present but tool registration failed (${regErr.name || 'Error'}) — this panel is rendering from the state machine instead. Every count below is still real; the agent surface is not.`;
     $('mcp-state').classList.add('degraded');
