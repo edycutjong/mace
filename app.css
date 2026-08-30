@@ -161,11 +161,10 @@ a:active { opacity: .7; }
    genuinely disabled (declarative.js), so this is an inactive component — but
    .42 was low enough to lose the heading, hence .58. */
 .card.is-out-of-order { opacity: .58; }
-/* The .58 dim composites --red down to an effective #884e4e on --bg-card: 2.56:1,
-   under the 4.5:1 AA floor for 10.88px text. Brighten the tag so that AFTER the
-   card's own opacity it still reads at 4.95:1. Measured, not guessed. */
-.card.is-out-of-order .tool-tag { color: #FFD2CE; }
-.card.is-out-of-order .tool-tag { color: var(--red); background: rgba(224,122,111,.1); text-decoration: line-through; }
+/* #FFD2CE, not --red: the card above dims to .58, which composites --red down to an
+   effective #884e4e on --bg-card — 2.56:1, under the 4.5:1 AA floor for 10.88px text.
+   This value clears 4.95:1 AFTER that composite. Measured with axe, not chosen by eye. */
+.card.is-out-of-order .tool-tag { color: #FFD2CE; background: rgba(224,122,111,.1); text-decoration: line-through; }
 
 /* The agent's own lifecycle on a declarative form, styled rather than left at the
    browser default, so a judge watching it fill the tally sees mace's affordance. */
