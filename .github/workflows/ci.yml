@@ -35,6 +35,23 @@ jobs:
       - name: vitest
         run: npx vitest run
 
+      # Runs the same 213+ tests again under the v8 coverage provider and
+      # enforces the per-file 100% thresholds set in vitest.config.js for the
+      # seven pure-logic modules (rule/fsm/effects/path/minutes/ronr.data/seed).
+      # ui.js, webmcp.js and declarative.js are deliberately excluded there —
+      # see the comment in vitest.config.js — and stay covered by e2e/ instead.
+      - name: coverage
+        run: npm run coverage
+
+      - name: upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 7
+          if-no-files-found: ignore
+
   # No bundler means nothing between src/*.js and the browser, so nothing catches a
   # typo'd identifier before a judge does. eslint.config.js is that step: no-undef
   # first, correctness rules after, and no formatter.

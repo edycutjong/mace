@@ -35,6 +35,7 @@ const topRank = (state) => {
 const GUARDS = {
   quorumPresent: (s) => s.present >= s.quorum
     ? { ok: true }
+    /* v8 ignore next -- unreachable: call_meeting_to_order is this guard's only user and is NOT in SUBQUORUM_ALLOWED, so rule()'s own §40 check above already returns before this guard ever runs sub-quorum; this branch can never execute through rule(). */
     : { ok: false, reason: `Only ${s.present} members are present; ${s.quorum} are needed for a quorum.` },
 
   stackEmpty: (s) => s.stack.length === 0
@@ -73,6 +74,7 @@ const GUARDS = {
     const tr = topRank(s);
     return rank != null && rank > tr
       ? { ok: true }
+      /* v8 ignore next -- the `top(s) ? … : 'question'` fallback is unreachable: every guarded tool's rank is >= 4, and topRank(s) is 0 exactly when top(s) is falsy, so reaching this ok:false arm with an empty stack never happens (rank > 0 always holds first) — 'question' can only be dead prose here. */
       : { ok: false, reason: `${MOTIONS[tool.motion].title} does not outrank the immediately pending ${top(s) ? MOTIONS[top(s).motion].title : 'question'}.` };
   },
 

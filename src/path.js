@@ -190,6 +190,7 @@ async function andOr(state, goal, depth, signal, tt, count, state0) {
         result = {
           kind: 'move',
           tool: move,
+          /* v8 ignore next -- the `?? move` fallback is unreachable: every `move` here comes from successors(), which is either 'put_the_question' (handled by the arm to the left) or a name drawn from legalTools(state), and ROWS is built from the very same GATED_TOOLS rows, every one of which carries a non-empty `title`. `row` and `row.title` can therefore never be falsy at this point. */
           title: move === 'put_the_question' ? 'The chair puts the question' : row?.title ?? move,
           ronr: row?.motion ? MOTIONS[row.motion]?.ronr : null,
           next: child
