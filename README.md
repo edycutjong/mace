@@ -193,18 +193,28 @@ contradicts the injected claim instead of merely surviving it.
 
 ```bash
 git clone https://github.com/edycutjong/mace.git && cd mace
-npm install                 # vitest only — zero runtime dependencies
+npm install                 # test + lint tooling only — zero runtime dependencies
 python3 -m http.server 8000 # then open http://localhost:8000
 ```
 
 ## 🧪 Testing & CI
 
 ```bash
-npm test          # 213 tests
+npm test          # 213 unit tests against the reducer and the rulebook
 npm run test:watch
+npm run lint      # eslint 9, flat config — correctness rules, no formatter
+npm run e2e       # 7 Playwright specs driving the real page in Chromium
 ```
 
-CI runs the suite on every push, plus CodeQL, Dependabot and a gitleaks history scan.
+The E2E suite serves the repo as static files — the same thing Netlify does — and
+asserts the panel counts the product's whole claim rests on: the widest frontier is
+17 acts, the tangle narrows it to 15, and four members in a room of nine cuts it to
+9 under §40. It reads those counts rather than `document.modelContext`, because the
+origin trial is bound to the live origin and a CI runner correctly falls back to the
+state machine — where the numbers are identical by design.
+
+CI runs the suite, the lint job and the E2E job on every push, plus CodeQL,
+Dependabot and a gitleaks history scan.
 Versions are derived from commits and published as tags and GitHub Releases — see
 [`CONTRIBUTING.md`](.github/CONTRIBUTING.md).
 
