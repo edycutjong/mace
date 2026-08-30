@@ -40,9 +40,11 @@ in-flight call.
 ## Versioning
 
 Versions are produced by `.github/workflows/release.yml` on every push to `main`, after the
-suite passes. **Git tags are the source of truth** — the workflow never commits back, because
-this repository's history is part of what is read. `package.json` carries `1.0.0` as a floor;
-`git describe --tags` is authoritative.
+suite passes. The workflow bumps `package.json`, commits it as
+`chore(release): vX.Y.Z [skip ci]`, tags **that** commit, and publishes a GitHub Release — so
+a clone at any tag has the matching `package.json`. Nothing is ever tagged before the tests go
+green. The `[skip ci]` marker plus a head-commit guard on the job is what stops the release
+commit from triggering another release.
 
 | Your commit | Bump |
 |---|---|

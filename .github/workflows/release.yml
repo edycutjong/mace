@@ -1,9 +1,11 @@
-# Semantic version, derived from commits, recorded as a tag and a GitHub Release.
+# Semantic version, derived from commits, recorded as a tag, a GitHub Release, and
+# a synced package.json.
 #
-# TAGS ARE THE SOURCE OF TRUTH. This workflow never commits back to main: the history
-# of this repository is part of what is being judged, and a "chore(release):" bot commit
-# after every push would double the commit count with noise. package.json carries 1.0.0
-# as a floor; `git describe --tags` is the authority.
+# The version bump is committed back to main as "chore(release): vX.Y.Z [skip ci]", so
+# package.json always matches the tag. That commit carries [skip ci] AND the job re-checks
+# the head commit before running, which is what stops the push it makes from retriggering
+# this workflow forever. The tag is created ON the release commit, so a clone at any tag
+# has the matching package.json version.
 #
 # BUMP RULES — this repository does not write Conventional Commits (messages here read
 # "pages: …", "interaction QA: …"), so a strict conventional parser would find nothing to
@@ -34,6 +36,8 @@ concurrency:
 jobs:
   release:
     runs-on: ubuntu-latest
+    # Belt and braces with [skip ci]: never release a release commit.
+    if: "!startsWith(github.event.head_commit.message, 'chore(release):')"
     steps:
       - uses: actions/checkout@v7
         with:
@@ -92,20 +96,40 @@ jobs:
           echo "prev=${last:-none}"  >> "$GITHUB_OUTPUT"
           echo "## \`v$next\` — $bump (was ${last:-none})" >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Tag and release
+      - name: Sync package.json, tag, and release
         if: steps.v.outputs.skip == 'false'
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ steps.v.outputs.tag }}
+          NEXT: ${{ steps.v.outputs.next }}
           PREV: ${{ steps.v.outputs.prev }}
         run: |
           set -euo pipefail
           if git rev-parse "$TAG" >/dev/null 2>&1; then
             echo "$TAG already exists — nothing to do"; exit 0
           fi
-          git -c user.name='github-actions[bot]' \
-              -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
-              tag -a "$TAG" -m "$TAG"
+
+          git config user.name  'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+          # npm version would also create its own tag and commit message; do it by hand
+          # so the message and the tag stay under this workflow's control.
+          node -e '
+            const fs=require("fs"), p="package.json";
+            const j=JSON.parse(fs.readFileSync(p,"utf8"));
+            j.version=process.env.NEXT;
+            fs.writeFileSync(p, JSON.stringify(j,null,2)+"\n");
+          '
+          if ! git diff --quiet -- package.json; then
+            git add package.json
+            git commit -m "chore(release): $TAG [skip ci]"
+            git push origin HEAD:main
+          else
+            echo "package.json already at $NEXT"
+          fi
+
+          # Tag AFTER the sync commit, so the tag and package.json agree.
+          git tag -a "$TAG" -m "$TAG"
           git push origin "$TAG"
 
           if [ "$PREV" = "none" ]; then

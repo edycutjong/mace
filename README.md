@@ -1,7 +1,7 @@
 <div align="center">
-  <img src="docs/assets/icon.svg" alt="mace icon — a stack of motion frames standing on the table, beside one struck-out tool" width="144">
+  <img src="docs/assets/icon-animated.svg" alt="mace icon — a stack of motion frames standing on the table, beside one struck-out tool" width="144">
 
-  <h1>mace 🏛</h1>
+  <h1>mace 👥</h1>
 
   <p><em>The tool list is the agenda.</em></p>
 

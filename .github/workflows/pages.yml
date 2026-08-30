@@ -12,6 +12,12 @@ on:
   push:
     branches: [main]
     paths: ['site/**', '.github/workflows/pages.yml']
+  # Redeploy when a version ships, so the version chip on the landing page is never
+  # stale. The chip is baked in at deploy time (see the substitution step) rather than
+  # fetched at runtime — the page makes zero network requests, and an anonymous
+  # api.github.com call would rate-limit to nothing exactly when a judge opens it.
+  release:
+    types: [published]
   workflow_dispatch:
 
 permissions:
@@ -30,6 +36,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0        # tags, or `git describe` below finds nothing to stamp
 
       # Fail loudly rather than shipping a half-broken domain. The CNAME is what binds
       # the custom domain, and an index that lost its assets is worse than no deploy.
@@ -41,6 +49,22 @@ jobs:
           grep -qx 'mace.edycu.dev' site/CNAME || { echo "CNAME is not mace.edycu.dev"; exit 1; }
           test -d site/assets        || { echo "site/assets missing"; exit 1; }
           echo "ok — $(find site -type f | wc -l | tr -d ' ') files"
+
+      - name: Bake the current version into the page
+        run: |
+          set -euo pipefail
+          V=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -z "$V" ]; then
+            echo "no tags yet — dropping the version chip rather than shipping a placeholder"
+            # Remove the whole anchor so a judge never sees the literal __VERSION__.
+            perl -0pi -e 's{<a class="tag tag--ver"[^>]*>__VERSION__</a>\s*}{}g' site/index.html
+          else
+            echo "stamping $V"
+            perl -0pi -e "s/__VERSION__/$V/g" site/index.html
+          fi
+          if grep -q '__VERSION__' site/index.html; then
+            echo "a __VERSION__ placeholder survived — refusing to publish it"; exit 1
+          fi
 
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
