@@ -10,7 +10,7 @@
  */
 
 import {
-  hasWebMCP, contextSource, modelContext, ledger, onChange, getState, getEvents,
+  hasWebMCP, contextSource, modelContext, ledger, reg, onChange, getState, getEvents,
   commit, runTool, outOfOrder, replayLog, start
 } from './webmcp.js';
 import { legalTools } from './rule.js';
@@ -50,8 +50,15 @@ async function renderInOrder() {
   const token = ++renderSeq;
 
   let names, annotations = new Map();
-  if (hasWebMCP) {
-    const tools = await modelContext.getTools();
+  // getTools() is the source of truth when it answers. When it throws — an agent browser
+  // with a half-working API — falling back to rule() keeps the panel honest rather than
+  // leaving it blank; the banner already says the agent surface is degraded.
+  let tools = null;
+  if (hasWebMCP && !reg.degraded) {
+    try { tools = await modelContext.getTools(); }
+    catch (err) { console.error('[mace] getTools() failed; rendering from the state machine:', err); }
+  }
+  if (tools) {
     names = tools.map(t => t.name).sort();
     tools.forEach(t => annotations.set(t.name, t.annotations ?? {}));
   } else {
@@ -261,14 +268,31 @@ export async function boot() {
 
   onChange(() => { renderAll(); });
 
-  const info = await start();
+  // start() must not be able to take the bench down with it. There is a third state
+  // beyond live/absent: an agent browser where document.modelContext EXISTS but
+  // registration fails. Observed 2026-08-30 in the Codex browser — the banner sat on
+  // its "checking for WebMCP…" placeholder and every checkpoint button was dead,
+  // because this await threw and the wiring below never ran. A page that looks like it
+  // is still loading, forever, is the worst of the three outcomes: it does not work AND
+  // it does not admit it. The rule this product is built on — never pretend the API is
+  // there when it is not — has to hold when the API is there but broken, too.
+  let info = null, startFailed = null;
+  try {
+    info = await start();
+  } catch (err) {
+    startFailed = err;
+    console.error('[mace] tool registration failed; the bench stays usable:', err);
+  }
 
   // THE PANEL IS THE TOOLCHANGE LISTENER. Not a listener the panel happens to
   // have — the event is what drives the product's main surface.
-  if (hasWebMCP) {
+  if (hasWebMCP && !startFailed) {
     modelContext.addEventListener('toolchange', () => { renderAll(); });
     $('mcp-state').textContent = `WebMCP live · ${info.contextSource}`;
     $('mcp-state').classList.add('ok');
+  } else if (startFailed) {
+    $('mcp-state').textContent = `WebMCP present but tool registration failed (${startFailed.name || 'Error'}) — this panel is rendering from the state machine instead. Every count below is still real; the agent surface is not.`;
+    $('mcp-state').classList.add('degraded');
   } else {
     $('mcp-state').textContent = 'WebMCP not detected — this panel is rendering from the state machine. With WebMCP it renders from document.modelContext.getTools().';
     $('mcp-state').classList.add('degraded');

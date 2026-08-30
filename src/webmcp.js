@@ -81,6 +81,11 @@ export const getEvents = () => events;
 // ── the toolchange ledger — three claims collapsed into one number ──────────
 export const ledger = { count: 0, added: [], removed: [], at: null, total: 0, degraded: !hasWebMCP };
 
+// Set once registerTool has rejected. getTools() will then under-report — it answers
+// honestly with what IS registered, which is not what SHOULD be in order — so the panel
+// needs to know to render from rule() instead of showing a truthfully-empty list.
+export const reg = { degraded: false };
+
 // ── controllers ─────────────────────────────────────────────────────────────
 const sessionCtl = new AbortController();   // lifetime 1 — reads, never diffed
 const registered = new Map();               // lifetime 2 — one controller per gated tool
@@ -313,10 +318,19 @@ export async function syncRegistration(st) {
     registered.get(name).abort();          // spec: abort-to-unregister
     registered.delete(name);
   }
-  for (const name of toAdd) await registerGated(name, st);
+  // A client where registerTool rejects must not take the bench down. Before this,
+  // one rejection aborted syncRegistration, so replayLog() never reached emit() and
+  // every checkpoint button silently did nothing. The agent surface degrades; the
+  // human one keeps working, and the banner says which.
+  const failed = [];
+  for (const name of toAdd) {
+    try { await registerGated(name, st); }
+    catch (err) { failed.push(name); reg.degraded = true;
+                  console.error(`[mace] registerTool("${name}") failed:`, err); }
+  }
 
   syncDeclarative(st, rule);               // the OTHER removal mechanism
-  ledgerNote(toAdd, toRemove, st);
+  ledgerNote(toAdd.filter(n => !failed.includes(n)), toRemove, st);
 }
 
 function ledgerNote(added, removed, st) {

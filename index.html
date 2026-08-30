@@ -187,7 +187,16 @@
 
 <script type="module">
   import { boot } from './src/ui.js';
-  boot();
+  // Last-resort backstop. boot() handles a failing start() itself; this catches anything
+  // it cannot, so the banner never sits on its placeholder pretending to still be loading.
+  boot().catch((err) => {
+    console.error('[mace] boot failed:', err);
+    const s = document.getElementById('mcp-state');
+    if (s && /checking for WebMCP/.test(s.textContent)) {
+      s.textContent = 'This page failed to start (' + (err?.name || 'Error') + '). Reload, or open the console for the reason.';
+      s.classList.add('degraded');
+    }
+  });
 </script>
 </body>
 </html>
