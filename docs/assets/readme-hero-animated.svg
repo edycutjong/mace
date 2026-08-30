@@ -110,7 +110,7 @@
   <text x="566" y="52" font-family="'Segoe UI', system-ui, -apple-system, sans-serif" font-weight="600" font-size="11" letter-spacing="1.3" fill="#A9B3C6">THE MOTION STACK</text>
   <!-- table strip: the mace lies on the table — business may be transacted -->
   <rect x="566" y="60" width="254" height="3" rx="1.5" fill="#C9A43A"/>
-  <g transform="translate(650,49)">
+  <g transform="translate(745,49)">
     <rect x="0" y="4" width="8" height="7" rx="2" fill="#E6C868"/>
     <rect x="9" y="2" width="26" height="11" rx="3" fill="#C9A43A"/>
     <rect x="35" y="5" width="22" height="5" rx="2.5" fill="#C9A43A"/>
