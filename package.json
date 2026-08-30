@@ -1,6 +1,6 @@
 {
   "name": "mace",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "description": "A clerk's bench for meetings run under Robert's Rules \u2014 the registered WebMCP tool set IS the motion stack.",

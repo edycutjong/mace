@@ -37,6 +37,23 @@ in-flight call.
   project, not preferences.
 - Keep the diff narrow. Explain *why* in the commit message; the code says what.
 
+## Versioning
+
+Versions are produced by `.github/workflows/release.yml` on every push to `main`, after the
+suite passes. **Git tags are the source of truth** — the workflow never commits back, because
+this repository's history is part of what is read. `package.json` carries `1.0.0` as a floor;
+`git describe --tags` is authoritative.
+
+| Your commit | Bump |
+|---|---|
+| `feat: …` or `feat(scope): …` | minor |
+| `feat!: …`, `fix!: …`, or `BREAKING CHANGE:` in the body | major |
+| anything else — including this repo's usual `topic: sentence` style | patch |
+
+The default is *patch* rather than *nothing* on purpose: most messages here are not
+Conventional Commits, and a parser that ignored them would leave the version frozen at 1.0.0
+forever. Use a `feat:` or `!` prefix when you actually want to escalate.
+
 ## Issues
 
 Bug and feature templates are in `.github/ISSUE_TEMPLATE/`. For a bug, the most useful thing
