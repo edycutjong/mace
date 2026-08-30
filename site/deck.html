@@ -4,6 +4,27 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>mace — the tool list is the agenda · pitch deck</title>
+<meta name="description" content="14 slides on mace: the registered WebMCP tool set IS the motion stack, so an action that is out of order does not exist to be called. Arrow keys to move, P for presenter mode.">
+<meta name="author" content="Edy Cu">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0A0D13">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://mace.edycu.dev/deck.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="mace">
+<meta property="og:locale" content="en_US">
+<meta property="og:url" content="https://mace.edycu.dev/deck.html">
+<meta property="og:title" content="mace — pitch deck">
+<meta property="og:description" content="The registered WebMCP tool set IS the motion stack. An action that is out of order does not exist to be called. 14 slides.">
+<meta property="og:image" content="https://mace.edycu.dev/assets/og-image.png">
+<meta property="og:image:width" content="2400">
+<meta property="og:image:height" content="1260">
+<meta property="og:image:alt" content="mace — the tool list is the agenda">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="mace — pitch deck">
+<meta name="twitter:description" content="The registered WebMCP tool set IS the motion stack. An action that is out of order does not exist to be called.">
+<meta name="twitter:image" content="https://mace.edycu.dev/assets/og-image.png">
+<meta name="twitter:image:alt" content="mace — the tool list is the agenda">
 <!--
 ═══════════════════════════════════════════════════════════════════════════════
   mace — pitch deck.  Single self-contained file. No CDN, no external request.
@@ -283,12 +304,16 @@ figcaption{font-family:var(--font-mono);font-size:13px;color:var(--text-low);mar
 /* the losing column is deliberately quieter — the point of the slide is which one you look at */
 .versus > .stack:first-child .tl-row{color:var(--text-mid)}
 .versus > .stack:first-child .tl,.versus > .stack:first-child .pre{opacity:.86}
+/* …but the .86 quieting drags these two small labels under 4.5:1 once composited.
+   Lift them one token; the column still reads as the quiet one. */
+.versus > .stack:first-child .tl-hd,
+.versus > .stack:first-child .tl-row .lock{color:var(--text-mid)}
 .vs-sub{font-family:var(--font-mono);font-size:14px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-low);margin-bottom:14px}
 .gap{
   height:56px;border-left:3px solid transparent;border-top:1px dashed rgba(242,99,91,.32);
   border-bottom:1px dashed rgba(242,99,91,.32);
   display:flex;align-items:center;padding-left:20px;
-  font-family:var(--font-mono);font-size:15px;color:rgba(242,99,91,.72);letter-spacing:.06em;
+  font-family:var(--font-mono);font-size:15px;color:rgba(242,99,91,.92);letter-spacing:.06em;
 }
 .slide.active .g-going{animation:strike .5s 1.2s both, vanish .7s 1.9s cubic-bezier(.4,0,.2,1) both}
 .slide.active .g-gap{animation:fadeIn .5s 2.7s both}
@@ -329,14 +354,19 @@ figcaption{font-family:var(--font-mono);font-size:13px;color:var(--text-low);mar
 .arch .t2{fill:var(--text-low);font-family:var(--font-ui);font-size:15px}
 .arch .tl2{fill:var(--primary);font-family:var(--font-mono);font-size:14px;letter-spacing:.06em}
 .arch .ar{stroke:var(--line);stroke-width:1.75;fill:none;marker-end:url(#ah)}
+.arch .ar-t{marker-end:none}                       /* trunk / bus — terminates in a junction, not a head */
 .arch .ar-g{stroke:rgba(62,207,142,.6)}
 .arch .ar-r{stroke:rgba(242,99,91,.6)}
+/* junction node — where one flow splits, the split is drawn, not implied */
+.arch .jn{fill:var(--line);stroke:none}
 
 /* ══ 11. OVERVIEW GRID (ESC) ═════════════════════════════════════════════════ */
 body.overview #stage{overflow:auto;background:#070A0F;padding:34px}
 body.overview .slide{
   position:relative;inset:auto;opacity:1;visibility:visible;pointer-events:auto;
-  zoom:.19;border:2px solid var(--line);border-radius:0;cursor:pointer;
+  /* 5 × 1920·zoom + 4 × 22px gap must fit 1920 − 2×34px padding = 1852.
+     .19 resolved to 1912px and clipped the fifth column; .18 gives 1816px. */
+  zoom:.18;border:2px solid var(--line);border-radius:0;cursor:pointer;
   transition:none;
 }
 body.overview .slide.active{border-color:var(--primary)}
@@ -347,7 +377,7 @@ body.overview #deck{
 body.overview .ovlabel{display:block}
 .ovlabel{
   display:none;position:absolute;left:0;bottom:0;z-index:5;
-  font-family:var(--font-mono);font-size:38px;color:var(--primary);
+  font-family:var(--font-mono);font-size:40px;color:var(--primary);   /* 40 × .18 ≈ 38 × .19 — same on-screen size */
   background:rgba(5,7,11,.86);padding:10px 22px;letter-spacing:.1em;
 }
 body.overview .chrome-top,body.overview .chrome-bot{opacity:.5}
@@ -835,8 +865,8 @@ Section 40: with no quorum, only adjournment, points of order, and correcting th
         </div>
         <p class="micro" style="font-size:15px;line-height:1.5">
           The run in this frame measured <span class="mono">2&nbsp;ms</span>.
-          Depth 6 and 399 nodes are stable; <span class="hi">the timing is not</span>, so we quote a
-          range and let the screen print its own number.
+          Depth 6 and 399 nodes are stable; <span class="hi">the timing is not</span> — measured across runs at 0.5–13&nbsp;ms, which is why
+          the screen prints its own number rather than this slide asserting one.
         </p>
         <div class="card-b">
           <p class="micro" style="font-size:16px;line-height:1.6">
@@ -968,12 +998,14 @@ The untrusted-content annotation is asserted by a test, not promised in a README
       <text class="t2" x="606" y="196">phase grid ∩ §40 quorum overlay</text>
       <text class="t2" x="606" y="218">∩ stack-shape guards · 19 rows</text>
 
-      <path class="ar" d="M876 186 H 1004"/>
-      <text class="tl2" x="880" y="172" style="font-size:13px">symmetric diff</text>
+      <!-- trunk runs all the way INTO the fork junction; no arrowhead, or the split reads as a break -->
+      <path class="ar ar-t" d="M876 186 H 1006"/>
+      <text class="tl2" x="941" y="172" text-anchor="middle" style="font-size:13px">symmetric diff</text>
 
-      <!-- 4 fork: two removal mechanisms -->
+      <!-- 4 fork: one junction, two removal mechanisms leaving it tangentially -->
       <path class="ar ar-g" d="M1006 186 C 1034 186, 1030 66, 1058 66" marker-end="url(#ah)"/>
       <path class="ar ar-r" d="M1006 186 C 1034 186, 1030 306, 1058 306" marker-end="url(#ah)"/>
+      <circle class="jn" cx="1006" cy="186" r="5"/>
 
       <rect class="bx" x="1064" y="6" width="384" height="120" rx="11"/>
       <text class="t1" x="1086" y="48">registerTool(…, {signal})</text>
@@ -994,10 +1026,13 @@ The untrusted-content annotation is asserted by a test, not promised in a README
       <text class="t2" x="1546" y="196">one event,</text>
       <text class="t2" x="1546" y="218">coalesced</text>
 
-      <!-- 6 the bus: one event, two readers, no second copy of the truth -->
-      <path class="ar" style="marker-end:none" d="M1618 246 V 404 H 300"/>
-      <path class="ar" d="M300 400 V 424"/>
-      <path class="ar" d="M880 400 V 424"/>
+      <!-- 6 the bus: one event, three readers. The bus taps each card at its centre and
+           terminates in the third arrowhead — no reader is passed over. -->
+      <path class="ar" d="M1618 246 V 404 H 251 V 426"/>
+      <path class="ar" d="M1383 404 V 426"/>
+      <path class="ar" d="M778 404 V 426"/>
+      <circle class="jn" cx="1383" cy="404" r="4"/>
+      <circle class="jn" cx="778" cy="404" r="4"/>
     </svg>
 
     <div class="rowgap" style="margin-top:6px;gap:26px">
@@ -1303,8 +1338,8 @@ The right column is not a roadmap of features, it is a list of the next things t
         <div style="display:flex;gap:26px;align-items:center">
           <!-- REAL QR — encodes https://pointoforder.netlify.app -->
           <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAYwAAAGMCAIAAABGWwIdAAAHmUlEQVR4nO3dXW1sNwBG0aS6XMohbwOniEpgeJznQCibMogsXdfdttcCMD8nky2/fPLn9/vrA6Dqj//7AwD8RKSANJEC0kQKSBMpIE2kgDSRAtJECkgTKSBNpIA0kQLSRApIEykgTaSANJEC0kQKSBMpIE2kgDSRAtJECkgTKSBNpIA0kQLSfs16oddf/3zc6vn7z2XPZ+S9amq/jZXPsPbdd3zOTlJAmkgBaSIFpIkUkCZSQJpIAWkiBaSJFJAmUkCaSAFpIgXcsd0bYXe25vPM2hLO+nvVPk9tR+n/4mdOUkCaSAFpIgWkiRSQJlJAmkgBaSIFpIkUkCZSQJpIAWkiBaQt3e7VNkG1zdSsjdvKHdyO+8eV9yTO8rr4/8JJCkgTKSBNpIA0kQLSRApIEykgTaSANJEC0kQKSBMpIE2kgLTcdu9UK/ditXvuapvE2i6PnzlJAWkiBaSJFJAmUkCaSAFpIgWkiRSQJlJAmkgBaSIFpIkUkGa7t8jKvdip77VS7e65mzlJAWkiBaSJFJAmUkCaSAFpIgWkiRSQJlJAmkgBaSIFpIkUkJbb7p26mZr1vVbezTfrdWr7vh1/Y8+Gn3kWJykgTaSANJEC0kQKSBMpIE2kgDSRAtJECkgTKSBNpIA0kQLSlm73ahuu2nev7em8zu+/zoib/y9GOEkBaSIFpIkUkCZSQJpIAWkiBaSJFJAmUkCaSAFpIgWkiRRwx3bv5nvBTn0+K3dwNSt3lPzMSQpIEykgTaSANJEC0kQKSBMpIE2kgDSRAtJECkgTKSBNpIC0z+/315QXck/Z71v5fGp3z424+fO8NtxRzvruTlJAmkgBaSIFpIkUkCZSQJpIAWkiBaSJFJAmUkCaSAFpIgXcce/ejtur2q7qZrM2ZTvuOnf8zM/C37OTFJAmUkCaSAFpIgWkiRSQJlJAmkgBaSIFpIkUkCZSQJpIAXds9069U692h13t+YzY8a632h7zOfS9RjhJAWkiBaSJFJAmUkCaSAFpIgWkiRSQJlJAmkgBaSIFpIkUcMd2b8dN2Qh7ur2e4azX2XED+Dr0vZykgDSRAtJECkgTKSBNpIA0kQLSRApIEykgTaSANJEC0kQKuGO7N8vKbdHKnVft84y4eU+30qwd3BO7L28WJykgTaSANJEC0kQKSBMpIE2kgDSRAtJECkgTKSBNpIA0kQLSlm73Zm3cZu2YZr3Xjtu02nvtuG1c6RXbG67kJAWkiRSQJlJAmkgBaSIFpIkUkCZSQJpIAWkiBaSJFJAmUkDa5/f7a9mb1TZls+y4Bdvx77VyRzmi9lt9YnvVWc/HSQpIEykgTaSANJEC0kQKSBMpIE2kgDSRAtJECkgTKSBNpIC0pffujVi5CRqx4717p+7yTn2Gp24/Z3GSAtJECkgTKSBNpIA0kQLSRApIEykgTaSANJEC0kQKSBMp4I7tXu3etJvvg6u9147btB23ja9DN5JOUkCaSAFpIgWkiRSQJlJAmkgBaSIFpIkUkCZSQJpIAWkiBaQtvXdvx01ZbTNVe4Y7vlfNyt/YK7aNHeEkBaSJFJAmUkCaSAFpIgWkiRSQJlJAmkgBaSIFpIkUkCZSQNrS7d6IHe+wq33m2vaqthfb8ffzbLghnfVeTlJAmkgBaSIFpIkUkCZSQJpIAWkiBaSJFJAmUkCaSAFpIgWkfX6/v6a80I7btJW7vJVbuZVq3/3UneBz6J16I5ykgDSRAtJECkgTKSBNpIA0kQLSRApIEykgTaSANJEC0kQKSMtt93a8w+7ULeHK53zq9zrVs3Df5yQFpIkUkCZSQJpIAWkiBaSJFJAmUkCaSAFpIgWkiRSQJlJA2q8dtzy1e8FG7LjLO3UHt+Ndiq9D79Qb4SQFpIkUkCZSQJpIAWkiBaSJFJAmUkCaSAFpIgWkiRSQJlLAHdu9HTdcs8zaQ816hjf/LWrfvbYB3JGTFJAmUkCaSAFpIgWkiRSQJlJAmkgBaSIFpIkUkCZSQJpIAXds90bsuFGqbcF2vDNu5f19tbsCa895lpW/MScpIE2kgDSRAtJECkgTKSBNpIA0kQLSRApIEykgTaSANJEC0pZu90acuqta+Xl2vAew9plr77XyOde+l5MUkCZSQJpIAWkiBaSJFJAmUkCaSAFpIgWkiRSQJlJAmkgBabnt3s1q9+WNmLUFq+3FdrzfcJbavs9JCkgTKSBNpIA0kQLSRApIEykgTaSANJEC0kQKSBMpIE2kgDTbvUv3UDUrt3K15zzr8zwbfvcRTlJAmkgBaSIFpIkUkCZSQJpIAWkiBaSJFJAmUkCaSAFpIgWk5bZ7O95TNsup+7VTv9epdxc+sefsJAWkiRSQJlJAmkgBaSIFpIkUkCZSQJpIAWkiBaSJFJAmUkDa5/f7a8oL7biZmmXl1mnWtnHWVq72XiNO3biduo11kgLSRApIEykgTaSANJEC0kQKSBMpIE2kgDSRAtJECkgTKeCO7R7Af8FJCkgTKSBNpIA0kQLSRApIEykgTaSANJEC0kQKSBMpIE2kgDSRAtJECkgTKSBNpIA0kQLSRApIEykgTaSANJEC0kQKSBMpIE2kgI+yfwGkcCB0xdKxRQAAAABJRU5ErkJggg==" alt="QR code linking to https://pointoforder.netlify.app" style="width:196px;height:196px;border-radius:10px;display:block">
-          <div class="stack" style="gap:12px">
-            <div class="mono" style="font-size:20px;color:var(--text-hi)">pointoforder<br>.netlify.app</div>
+          <div class="stack" style="gap:12px;align-items:flex-start">
+            <div class="mono" style="font-size:20px;color:var(--text-hi);white-space:nowrap">pointoforder.netlify.app</div>
             <span class="badge" style="font-size:12px"><span class="livedot"></span>live now</span>
           </div>
         </div>

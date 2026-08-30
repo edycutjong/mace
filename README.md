@@ -85,18 +85,10 @@ business. No mace, no valid business. Here: **no tool, not in order.**
 
 ## 🏗️ Architecture & Tech Stack
 
-```mermaid
-flowchart LR
-  L["append-only<br/>event log"] --> R["reduce()<br/>fsm.js"]
-  R --> S["state<br/>phase · stack · present"]
-  S --> P["rule()<br/>the ONE predicate"]
-  P --> D{"symmetric diff<br/>vs registered"}
-  D -->|"now legal"| A["registerTool()"]
-  D -->|"now illegal"| B["signal.abort()<br/><i>no unregisterTool exists</i>"]
-  D -->|"declarative"| C["removeAttribute('toolname')"]
-  A & B & C --> T(["toolchange"])
-  T --> U["the legality panel<br/><i>IS</i> the listener"]
-```
+<p align="center">
+  <img src="docs/assets/architecture.png" width="100%"
+       alt="mace architecture: an append-only event log reduces to state; one rule() predicate produces the legal set; a symmetric diff against what is registered forks into two removal mechanisms — registerTool with an AbortSignal for the 17 imperative tools, and removing a toolname attribute for the 2 declarative ones — and both converge on a single toolchange event that drives the panel's two columns.">
+</p>
 
 | Layer | Choice | Why |
 |---|---|---|

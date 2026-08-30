@@ -1,0 +1,91 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="mace — the second amendment lands: move_to_amend_the_amendment leaves green getTools(); record_vote_tally stays struck red — §12 — never refused.">
+  <!-- STORYBOARD (dur 6s — must equal this file's single master dur)
+    0-10%   steady state: the full mace — crown, three frames, shaft, table — with the standing
+            struck ring (the absence that never leaves). Poster == icon.svg geometry exactly.
+    10-25%  trigger:      a landing flash sweeps the top frame; the tool appears green in getTools()   data-story="beat-2"
+    25-55%  mechanism:    The second amendment lands: move_to_amend_the_amendment leaves green getTools(); record_vote_tally stays struck red — §12 — never refused.   data-story="beat-3"
+    55-80%  resolution:   the tool stays gone; the struck ring stands; brass glow breath  data-story="beat-4"
+    80-100% breathe + seam fade: story layers restore the steady state by 96% (rules 5-7)
+    (The green orb is move_to_amend_the_amendment — it registers, the amendment lands on the top
+     frame, the strike crosses it, it ceases to exist. The standing struck ring is
+     record_vote_tally — struck red at every instant of the loop, §12.)
+  -->
+  <style>
+    @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+  </style>
+  <defs>
+    <linearGradient id="plate" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#10141D"/>
+      <stop offset="100%" stop-color="#0A0D13"/>
+    </linearGradient>
+    <linearGradient id="brassHi" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#E6C868"/>
+      <stop offset="100%" stop-color="#C9A43A"/>
+    </linearGradient>
+    <linearGradient id="brassLo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#C9A43A"/>
+      <stop offset="100%" stop-color="#A8862E"/>
+    </linearGradient>
+    <filter id="glow" x="46" y="20" width="420" height="472" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="14"/>
+    </filter>
+  </defs>
+
+  <!-- plate -->
+  <rect x="16" y="16" width="480" height="480" rx="104" fill="url(#plate)"/>
+  <rect x="17" y="17" width="478" height="478" rx="103" stroke="#2E3A54" stroke-width="2" fill="none"/>
+
+  <!-- steady brass aura (brand layer, visible at t=0) -->
+  <g filter="url(#glow)" opacity="0.28">
+    <rect x="150" y="60" width="212" height="236" rx="10" fill="#C9A43A"/>
+    <rect x="86" y="404" width="340" height="42" rx="21" fill="#C9A43A"/>
+  </g>
+
+  <!-- glow breath at resolution -->
+  <g filter="url(#glow)" opacity="0" data-story="beat-4">
+    <rect x="150" y="60" width="212" height="236" rx="10" fill="#C9A43A"/>
+    <animate attributeName="opacity" dur="6s" repeatCount="indefinite"
+      values="0;0;0.45;0;0" keyTimes="0;0.55;0.70;0.86;1"/>
+  </g>
+
+  <!-- brand layer: the full mace — identical to icon.svg, fully visible at t=0 -->
+  <g>
+    <rect x="150" y="60" width="44" height="36" rx="8" fill="url(#brassHi)"/>
+    <rect x="234" y="60" width="44" height="36" rx="8" fill="url(#brassHi)"/>
+    <rect x="318" y="60" width="44" height="36" rx="8" fill="url(#brassHi)"/>
+    <rect x="150" y="106" width="212" height="50" rx="10" fill="url(#brassHi)"/>
+    <rect x="150" y="176" width="212" height="50" rx="10" fill="url(#brassLo)"/>
+    <rect x="150" y="246" width="212" height="50" rx="10" fill="url(#brassLo)"/>
+    <rect x="238" y="288" width="36" height="126" rx="16" fill="url(#brassLo)"/>
+    <rect x="86" y="404" width="340" height="42" rx="21" fill="url(#brassHi)"/>
+  </g>
+
+  <!-- brand layer: the standing absence — struck red at every instant (record_vote_tally, §12) -->
+  <g>
+    <circle cx="416" cy="116" r="40" stroke="#F2635B" stroke-width="15" fill="none"/>
+    <rect x="362" y="107" width="108" height="18" rx="9" fill="#F2635B"/>
+  </g>
+
+  <!-- beat 2: the second-degree amendment lands — flash sweeps the top frame -->
+  <rect x="150" y="106" width="212" height="50" rx="10" fill="#E6C868" opacity="0" data-story="beat-2">
+    <animate attributeName="opacity" dur="6s" repeatCount="indefinite"
+      values="0;0;0.85;0;0" keyTimes="0;0.18;0.23;0.32;1"/>
+  </rect>
+
+  <!-- beat 2→3: the tool — green while it is in getTools() -->
+  <circle cx="412" cy="216" r="30" fill="#3ECF8E" opacity="0" data-story="beat-2">
+    <animate attributeName="opacity" dur="6s" repeatCount="indefinite"
+      values="0;0;1;1;0;0" keyTimes="0;0.12;0.18;0.40;0.52;1"/>
+    <animate attributeName="fill" dur="6s" repeatCount="indefinite"
+      values="#3ECF8E;#3ECF8E;#F2635B;#F2635B" keyTimes="0;0.34;0.38;1"/>
+  </circle>
+
+  <!-- beat 3: the strike — after it, the tool does not exist -->
+  <line x1="374" y1="216" x2="450" y2="216" stroke="#F2635B" stroke-width="12" stroke-linecap="round"
+        pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" opacity="0" data-story="beat-3">
+    <animate attributeName="stroke-dashoffset" dur="6s" repeatCount="indefinite"
+      values="100;100;0;0" keyTimes="0;0.34;0.42;1"/>
+    <animate attributeName="opacity" dur="6s" repeatCount="indefinite"
+      values="0;0;1;1;0;0" keyTimes="0;0.34;0.36;0.46;0.54;1"/>
+  </line>
+</svg>
