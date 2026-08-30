@@ -1,0 +1,12 @@
+[extend]
+useDefault = true
+
+# origin-trial.json holds the Chrome origin-trial token for the WebMCP feature. It is
+# public by construction: the browser only honours it when the same string is served in
+# the clear as an `Origin-Trial:` response header from https://pointoforder.netlify.app,
+# so it is already readable with `curl -I` on the live site. It is bound to that one
+# origin and grants nothing anywhere else. Its high entropy reads as a generic API key
+# to the default rule set, which is the only reason this entry exists.
+[allowlist]
+description = "Chrome origin-trial token — served publicly in a response header, bound to one origin"
+paths = ['''^origin-trial\.json$''']
