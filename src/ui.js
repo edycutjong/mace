@@ -286,12 +286,13 @@ export async function boot() {
 
   // THE PANEL IS THE TOOLCHANGE LISTENER. Not a listener the panel happens to
   // have — the event is what drives the product's main surface.
-  if (hasWebMCP && !startFailed) {
+  const regErr = startFailed ?? info?.registrationError ?? null;
+  if (hasWebMCP && !regErr) {
     modelContext.addEventListener('toolchange', () => { renderAll(); });
     $('mcp-state').textContent = `WebMCP live · ${info.contextSource}`;
     $('mcp-state').classList.add('ok');
-  } else if (startFailed) {
-    $('mcp-state').textContent = `WebMCP present but tool registration failed (${startFailed.name || 'Error'}) — this panel is rendering from the state machine instead. Every count below is still real; the agent surface is not.`;
+  } else if (regErr) {
+    $('mcp-state').textContent = `WebMCP present but tool registration failed (${regErr.name || 'Error'}) — this panel is rendering from the state machine instead. Every count below is still real; the agent surface is not.`;
     $('mcp-state').classList.add('degraded');
   } else {
     $('mcp-state').textContent = 'WebMCP not detected — this panel is rendering from the state machine. With WebMCP it renders from document.modelContext.getTools().';

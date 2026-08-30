@@ -383,13 +383,29 @@ export const outOfOrder = (st) => frontier(st).filter(f => !f.legal);
 // ── boot ────────────────────────────────────────────────────────────────────
 export async function start() {
   wireDeclarative(commit, () => state);
+
+  // `'registerTool' in modelContext` proves the property exists, not that calling it
+  // works. ChatGPT's in-app browser reports a TypeError out of this path (observed
+  // 2026-08-30) — so feature detection is not enough and every call here has to be
+  // survivable. If the agent surface cannot be built, the bench still runs as a human
+  // tool and the banner says the surface is degraded. reg.degraded makes the panel
+  // render from rule() rather than from a getTools() that would under-report.
   if (hasWebMCP) {
-    await registerReads();
-    await syncRegistration(state);
+    try {
+      await registerReads();
+      await syncRegistration(state);
+    } catch (err) {
+      reg.degraded = true;
+      console.error('[mace] WebMCP is present but the tool surface could not be built:', err);
+      syncDeclarative(state, rule);
+      ledgerNote([], [], state);
+      emit();
+      return { hasWebMCP, contextSource, registrationError: err };
+    }
   } else {
     syncDeclarative(state, rule);
     ledgerNote([], [], state);
   }
   emit();
-  return { hasWebMCP, contextSource };
+  return { hasWebMCP, contextSource, registrationError: null };
 }
