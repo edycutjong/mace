@@ -86,6 +86,12 @@ Recorded because the honest absence is worth more than a tick.
 - **Germaneness is never ruled on.** Not computable from a table, so the chair rules and the
   ruling enters the minutes. That limit is the design, not a gap — and it means mace cannot
   claim to enforce all of Robert's Rules.
+- **No small-board mode (§49).** RONR relaxes procedure for boards under about twelve members —
+  no need to be recognized, unlimited debate, informal voting, the chair participating. mace
+  models the full rules only. An HOA board member pointed this out when I asked r/HOA how
+  procedure works in practice, and they were right: most HOA boards qualify for §49, so mace is
+  stricter than the rulebook requires for exactly the audience it names. Fixing it is a second
+  data file, not a rewrite — the rulebook is already pure data — but it is not written.
 - **The meeting is seeded.** A fictional HOA board log. It is not a dressed screen — every
   checkpoint replays through the same `reduce()` the live bench uses, and you can drive it
   forward yourself from any of them.
