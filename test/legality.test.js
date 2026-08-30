@@ -59,6 +59,7 @@ function stateFor(phase, toolName) {
 }
 
 describe('the legality grid — 133 cells (7 phases x 19 gated tools)', () => {
+  // eslint-disable-next-line no-unused-vars -- tally kept as a live cross-check while writing the grid; the "exactly 133 cells" assertion below is the one that runs.
   let cells = 0;
   for (const [toolName, row] of Object.entries(GRID)) {
     describe(toolName, () => {
