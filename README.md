@@ -243,10 +243,13 @@ src/seed.js        one real meeting, as data
 
 ## 📽️ Demo Materials
 
-| | |
-|---|---|
-| **Live bench** | <https://pointoforder.netlify.app> — WebMCP is live here |
-| **Overview + pitch deck** | <https://mace.edycu.dev> · [deck](https://mace.edycu.dev/deck.html) |
+- **Live bench** — <https://pointoforder.netlify.app>
+  WebMCP resolves on this origin and no other: the trial token is bound to it.
+- **Demo video** — <https://youtu.be/rifg2qmblJ4> · 2:37, captioned, chapters
+- **For judges** — <https://mace.edycu.dev/judge.html>
+  The claim, a 30-second click path, the receipts, and what this has *not* proved.
+- **Overview** — <https://mace.edycu.dev> · **Pitch deck** — <https://mace.edycu.dev/deck.html>
+- **Devpost** — <https://devpost.com/software/mace>
 
 ## 📄 License
 
