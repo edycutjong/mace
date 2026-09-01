@@ -122,5 +122,27 @@ export default [
       globals: { process: 'readonly', console: 'readonly', URL: 'readonly' }
     },
     rules: correctness
+  },
+
+  /**
+   * ── bench.mjs: a node script that also contains browser code ──────────────
+   * It runs under node (process, console) but the bodies it hands to
+   * page.evaluate() are serialised and executed inside Chromium, so `document`
+   * and `performance` in this one file are real at their point of use and not
+   * typos. Both sets are declared here for that reason; without this block the
+   * file matched no config at all and every one of those names was a no-undef.
+   */
+  {
+    files: ['*.mjs'],
+    languageOptions: {
+      ecmaVersion: 2023,
+      sourceType: 'module',
+      globals: {
+        ...browserGlobals,
+        process: 'readonly',
+        performance: 'readonly'
+      }
+    },
+    rules: correctness
   }
 ];
